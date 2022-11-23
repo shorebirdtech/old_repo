@@ -1,18 +1,27 @@
+import 'dart:async';
 import 'dart:io';
+
+import "package:eventsource/publisher.dart";
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
-import "package:shelf_router/shelf_router.dart";
-import 'dart:async';
-
 import "package:shelf_eventsource/shelf_eventsource.dart";
-import "package:eventsource/publisher.dart";
+import "package:shelf_router/shelf_router.dart";
 
-// Not used for anything yet.
+class RequestContext {}
+
+// HACK: Make AuthenticatedContext a separate type.
+typedef AuthenticatedContext = RequestContext;
+
+// devs will want to store arbitrary data on the session?
 class Session {
+  factory Session.of(RequestContext context) {
+    return Session();
+  }
+
   Session();
 }
 
-class Endpoint {}
+abstract class Endpoint {}
 
 abstract class ShorebirdHandler {
   void addRoutes(Router router) {}
@@ -55,9 +64,6 @@ class Server {
     server.autoCompress = true;
   }
 }
-
-// Most of MyStore should move here, but can't without codegen.
-class DataStore {}
 
 // Could use https://pub.dev/packages/state_notifier/versions/0.7.0
 // But should just be able to use package:flutter/foundation.dart.
