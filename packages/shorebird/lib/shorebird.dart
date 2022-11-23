@@ -58,7 +58,7 @@ class Server {
 
     var handler =
         const Pipeline().addMiddleware(logRequests()).addHandler(router);
-    server = await shelf_io.serve(handler, 'localhost', 8080);
+    server = await shelf_io.serve(handler, host, port);
 
     // Enable content compression
     server.autoCompress = true;
