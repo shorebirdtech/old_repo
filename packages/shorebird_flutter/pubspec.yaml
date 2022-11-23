@@ -11,7 +11,10 @@ dependencies:
     sdk: flutter
 
   shorebird:
-    path: ../shorebird
+    # path: ../shorebird
+    git:
+      url: https://github.com/shorebirdtech/shorebird.git
+      path: packages/shorebird
 
 dev_dependencies:
   flutter_test:
