@@ -51,7 +51,7 @@ class Server {
   InternetAddress get address => server.address;
 
   Future<void> serve(
-      List<ShorebirdHandler> endpoints, String host, int port) async {
+      List<ShorebirdHandler> endpoints, Object host, int port) async {
     var router = Router();
     for (var endpoint in endpoints) {
       endpoint.addRoutes(router);
