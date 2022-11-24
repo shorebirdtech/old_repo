@@ -4,6 +4,7 @@ import 'dart:io';
 import "package:eventsource/publisher.dart";
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
+import 'package:shelf_cors_headers/shelf_cors_headers.dart';
 import "package:shelf_eventsource/shelf_eventsource.dart";
 import "package:shelf_router/shelf_router.dart";
 
@@ -56,8 +57,10 @@ class Server {
       endpoint.addRoutes(router);
     }
 
-    var handler =
-        const Pipeline().addMiddleware(logRequests()).addHandler(router);
+    var handler = const Pipeline()
+        .addMiddleware(logRequests())
+        .addMiddleware(corsHeaders())
+        .addHandler(router);
     server = await shelf_io.serve(handler, host, port);
 
     // Enable content compression
