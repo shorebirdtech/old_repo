@@ -11,7 +11,6 @@ dependencies:
     sdk: flutter
 
   shorebird:
-    # path: ../shorebird
     git:
       url: https://github.com/shorebirdtech/shorebird.git
       path: packages/shorebird
@@ -19,14 +18,9 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
   flutter_lints: ^2.0.0
 
+# Dependency overrides are ignored by packages who depend on us.
 dependency_overrides:
-  eventsource:
-    git: https://github.com/eseidel/dart-eventsource.git
+  shorebird:
+    path: ../shorebird
