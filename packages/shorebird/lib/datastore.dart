@@ -15,14 +15,12 @@ class ObjectIdConverter extends JsonConverter<ObjectId, String> {
 
 class DbJsonConverter {
   static Map<String, dynamic> toDbJson(Map<String, dynamic> json) {
-    print("toDbJson: $json");
     json['_id'] = ObjectId.fromHexString(json['id']);
     json.remove('id');
     return json;
   }
 
   static Map<String, dynamic> fromDbJson(Map<String, dynamic> json) {
-    print("fromDbJson: $json");
     json['id'] = json['_id'].toHexString();
     json.remove('_id');
     return json;
