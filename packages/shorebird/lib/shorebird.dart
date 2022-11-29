@@ -1,11 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 
-import "package:eventsource/publisher.dart";
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf_cors_headers/shelf_cors_headers.dart';
-import "package:shelf_eventsource/shelf_eventsource.dart";
 import "package:shelf_router/shelf_router.dart";
 
 class RequestContext {}
@@ -26,20 +24,6 @@ abstract class Endpoint {}
 
 abstract class ShorebirdHandler {
   void addRoutes(Router router) {}
-}
-
-class StreamToEventSource<T> extends EventSourcePublisher {
-  // Not clear id or cacheCapacity matter for our use cases.
-  final int nextId = 0;
-  StreamToEventSource(Stream<T> stream) : super(cacheCapacity: 100) {
-    stream.listen((T value) {
-      add(Event(id: nextId.toString(), data: value.toString()));
-    });
-  }
-}
-
-Handler streamHandler<T>(Stream<T> stream) {
-  return eventSourceHandler(StreamToEventSource(stream));
 }
 
 class Server {
