@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf_cors_headers/shelf_cors_headers.dart';
-import "package:shelf_router/shelf_router.dart";
+import "package:shelf_router/shelf_router.dart" as shelf_router;
 
 class RequestContext {}
 
@@ -22,8 +22,23 @@ class Session {
 
 abstract class Endpoint {}
 
+class Router {
+  final _routes = <String, Function>{};
+  void addRoute(String path, Handler handler) {}
+
+  shelf_router.Router shelfHandler() {
+    var router = shelf_router.Router();
+    for (var entry in _routes.entries) {
+      var path = entry.key;
+      var handler = entry.value;
+      router.post(path, handler);
+    }
+    return router;
+  }
+}
+
 abstract class ShorebirdHandler {
-  void addRoutes(Router router) {}
+  void collectRoutes(Router router) {}
 }
 
 class Server {
@@ -38,13 +53,13 @@ class Server {
       List<ShorebirdHandler> endpoints, Object host, int port) async {
     var router = Router();
     for (var endpoint in endpoints) {
-      endpoint.addRoutes(router);
+      endpoint.collectRoutes(router);
     }
 
     var handler = const Pipeline()
         .addMiddleware(logRequests())
         .addMiddleware(corsHeaders())
-        .addHandler(router);
+        .addHandler(router.shelfHandler());
     server = await shelf_io.serve(handler, host, port);
 
     // Enable content compression
