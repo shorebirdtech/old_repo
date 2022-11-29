@@ -1,7 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:shorebird/datastore.dart';
 
-export 'package:mongo_dart/mongo_dart.dart';
+export 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 
 class ObjectIdConverter extends JsonConverter<ObjectId, String> {
   const ObjectIdConverter();
