@@ -24,7 +24,9 @@ abstract class Endpoint {}
 
 class Router {
   final _routes = <String, Function>{};
-  void addRoute(String path, Handler handler) {}
+  void addRoute(String path, Handler handler) {
+    _routes[path] = handler;
+  }
 
   shelf_router.Router shelfHandler() {
     var router = shelf_router.Router();
@@ -38,7 +40,7 @@ class Router {
 }
 
 abstract class ShorebirdHandler {
-  void collectRoutes(Router router) {}
+  void collectRoutes(Router router);
 }
 
 class Server {
