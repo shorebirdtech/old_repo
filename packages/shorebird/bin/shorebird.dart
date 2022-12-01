@@ -1,3 +1,5 @@
-void main(List<String> arguments) {
-  print("Hello shorebird!");
+import 'package:shorebird/src/cli/main.dart' as cli;
+
+void main(List<String> args) {
+  cli.main(args);
 }

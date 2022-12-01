@@ -15,6 +15,10 @@ dependencies:
   json_annotation: ^4.7.0
   args: ^2.3.1
   sembast: ^3.3.1
+  analyzer: ^5.2.0
+  path: ^1.8.2
+  code_builder: ^4.3.0
+  dart_style: ^2.2.4
 
 dev_dependencies:
   lints: ^2.0.0
