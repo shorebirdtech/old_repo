@@ -85,4 +85,17 @@ class CollectionMongo<T> extends Collection<T> {
   // Future<void> deleteOne(ObjectId id) async {
   //   await _collection.remove(where.id(id));
   // }
+
+  @override
+  Stream<T> watchAdditions() {
+    // Untested, from:
+    // https://github.com/mongo-dart/mongo_dart/blob/rel-0-8/example/manual/watch/watch_on_collection_insert.dart
+    return _collection.watch(<Map<String, Object>>[
+      {
+        r'$match': {'operationType': 'insert'}
+      }
+    ]).map((changeEvent) {
+      return classInfo.fromDbJson(changeEvent.fullDocument);
+    });
+  }
 }

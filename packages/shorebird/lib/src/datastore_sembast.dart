@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
 
@@ -111,5 +113,42 @@ class CollectionSembast<T> extends Collection<T> {
       dbJson['_id'] = id;
       return classInfo.fromDbJson(dbJson);
     });
+  }
+
+  @override
+  Stream<T> watchAdditions() {
+    // https://github.com/tekartik/sembast.dart/blob/master/sembast/doc/new_api.md#listen-to-changes
+    bool seenFirstUpdate = false;
+    Set<String> seenRecords = {};
+
+    late StreamController<T> controller;
+
+    // This is like stream.expand, except we cancel the inner stream when the
+    // outer is canceled.  Maybe there is a better way?
+    var subscription = store.query().onSnapshots(db).listen((snapshots) {
+      if (!seenFirstUpdate) {
+        seenFirstUpdate = true;
+        seenRecords = snapshots.map((snapshot) => snapshot.key).toSet();
+        return;
+      }
+      for (var snapshot in snapshots) {
+        if (seenRecords.contains(snapshot.key)) continue;
+        seenRecords.add(snapshot.key);
+        var dbJson = snapshot.value;
+        controller.add(classInfo.fromDbJson(dbJson));
+      }
+    });
+    controller = StreamController<T>(
+      onListen: () {
+        subscription.resume();
+      },
+      onPause: () {
+        subscription.pause();
+      },
+      onCancel: () {
+        subscription.cancel();
+      },
+    );
+    return controller.stream;
   }
 }

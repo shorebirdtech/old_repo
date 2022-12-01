@@ -40,7 +40,18 @@ class ClassInfo<T> {
   // Could be a method on T, if we required a baseclass.
   final Map<String, dynamic> Function(T) toDbJson;
 
-  const ClassInfo(this.tableName, this.fromDbJson, this.toDbJson) : type = T;
+  // Cannot be a method on T because it's a static.
+  final T Function(Map<String, dynamic> dbJson) fromJson;
+  // Could be a method on T, if we required a baseclass.
+  final Map<String, dynamic> Function(T) toJson;
+
+  const ClassInfo({
+    required this.tableName,
+    required this.fromDbJson,
+    required this.toDbJson,
+    required this.fromJson,
+    required this.toJson,
+  }) : type = T;
 }
 
 const where = SelectorBuilder();
@@ -78,5 +89,8 @@ abstract class Collection<T> {
 
   Stream<T> find(SelectorBuilder selector);
 
+  // This should be add?
   Future<T> create(T object);
+
+  Stream<T> watchAdditions();
 }

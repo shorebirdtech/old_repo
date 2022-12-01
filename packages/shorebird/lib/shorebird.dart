@@ -6,6 +6,8 @@ import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf_cors_headers/shelf_cors_headers.dart';
 import "package:shelf_router/shelf_router.dart" as shelf_router;
 
+export 'package:shorebird/src/eventsource.dart';
+
 class RequestContext {}
 
 // HACK: Make AuthenticatedContext a separate type.
