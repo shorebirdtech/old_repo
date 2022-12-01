@@ -10,7 +10,7 @@ void main(List<String> arguments) {
   var client = Client();
 
   // Subscribe to a stream from the server for messages.
-  client.newMessages().listen((message) {
+  var subscription = client.newMessages().listen((message) {
     print('Received message: ${message.message} at ${message.time}');
   });
 
@@ -23,6 +23,8 @@ void main(List<String> arguments) {
       );
       if (t.tick >= 5) {
         t.cancel();
+        // Also stop listening for new messages so main can exit.
+        subscription.cancel();
       }
     },
   );

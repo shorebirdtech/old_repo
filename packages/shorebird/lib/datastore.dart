@@ -17,28 +17,14 @@ class ObjectIdConverter extends JsonConverter<ObjectId, String> {
   String toJson(ObjectId object) => object.toHexString();
 }
 
-class DbJsonConverter {
-  static Map<String, dynamic> toDbJson(Map<String, dynamic> json) {
-    json['_id'] = ObjectId.fromHexString(json['id']);
-    json.remove('id');
-    return json;
-  }
-
-  static Map<String, dynamic> fromDbJson(Map<String, dynamic> json) {
-    json['id'] = json['_id'].toHexString();
-    json.remove('_id');
-    return json;
-  }
-}
-
 class ClassInfo<T> {
   final Type type;
   // Cannot be a static on T as far as I know.
   final String tableName;
-  // Cannot be a method on T because it's a static.
-  final T Function(Map<String, dynamic> dbJson) fromDbJson;
-  // Could be a method on T, if we required a baseclass.
-  final Map<String, dynamic> Function(T) toDbJson;
+  // // Cannot be a method on T because it's a static.
+  // final T Function(Map<String, dynamic> dbJson) fromDbJson;
+  // // Could be a method on T, if we required a baseclass.
+  // final Map<String, dynamic> Function(T) toDbJson;
 
   // Cannot be a method on T because it's a static.
   final T Function(Map<String, dynamic> dbJson) fromJson;
@@ -47,11 +33,21 @@ class ClassInfo<T> {
 
   const ClassInfo({
     required this.tableName,
-    required this.fromDbJson,
-    required this.toDbJson,
+    // required this.fromDbJson,
+    // required this.toDbJson,
     required this.fromJson,
     required this.toJson,
   }) : type = T;
+}
+
+// This is needed to perform the cast from ClassInfo<dynamic> to ClassInfo<T>
+// Since Map<Type, ClassInfo<dynamic>> is intentionally dynamic.
+ClassInfo<T> lookupClassInfo<T>(Map<Type, ClassInfo> classInfoMap) {
+  var classInfo = classInfoMap[T];
+  if (classInfo == null) {
+    throw ArgumentError('No ClassInfo for $T');
+  }
+  return classInfo as ClassInfo<T>;
 }
 
 const where = SelectorBuilder();

@@ -7,6 +7,7 @@ import 'package:shelf_cors_headers/shelf_cors_headers.dart';
 import "package:shelf_router/shelf_router.dart" as shelf_router;
 
 export 'package:shorebird/src/eventsource.dart';
+export 'package:shorebird/src/eventsource_handler.dart';
 
 class RequestContext {}
 
@@ -25,20 +26,12 @@ class Session {
 abstract class Endpoint {}
 
 class Router {
-  final _routes = <String, Function>{};
-  void addRoute(String path, Handler handler) {
-    _routes[path] = handler;
+  final shelf_router.Router _router = shelf_router.Router();
+  void addRoute(String path, Handler handler, {String method = 'POST'}) {
+    _router.add(method, path, handler);
   }
 
-  shelf_router.Router shelfHandler() {
-    var router = shelf_router.Router();
-    for (var entry in _routes.entries) {
-      var path = entry.key;
-      var handler = entry.value;
-      router.post(path, handler);
-    }
-    return router;
-  }
+  shelf_router.Router shelfHandler() => _router;
 }
 
 abstract class ShorebirdHandler {

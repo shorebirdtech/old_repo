@@ -4,6 +4,24 @@ import 'package:mongo_dart/mongo_dart.dart' as mongo;
 
 import '../datastore.dart';
 
+class MongoJsonConverter {
+  static Map<String, dynamic> toDbJson(Map<String, dynamic> json) {
+    var id = json['id'];
+    if (id == null || id is! String) {
+      throw Exception('Missing id in json');
+    }
+    json['_id'] = ObjectId.fromHexString(id);
+    json.remove('id');
+    return json;
+  }
+
+  static Map<String, dynamic> fromDbJson(Map<String, dynamic> json) {
+    json['id'] = json['_id'].toHexString();
+    json.remove('_id');
+    return json;
+  }
+}
+
 extension SelectorBuilderMongo on SelectorBuilder {
   mongo.SelectorBuilder toMongo() {
     var mongoSelector = mongo.SelectorBuilder();
@@ -53,11 +71,21 @@ class CollectionMongo<T> extends Collection<T> {
   CollectionMongo(mongo.Db db, super.classInfo)
       : _collection = db.collection(classInfo.tableName);
 
+  Map<String, dynamic> _toDbJson(T object) {
+    var json = classInfo.toJson(object);
+    return MongoJsonConverter.toDbJson(json);
+  }
+
+  T _fromDbJson(Map<String, dynamic> dbJson) {
+    var json = MongoJsonConverter.fromDbJson(dbJson);
+    return classInfo.fromJson(json);
+  }
+
   @override
   Future<T?> byId(mongo.ObjectId id) async {
     var dbJson = await _collection.findOne(where.id(id).toMongo());
     if (dbJson == null) return null;
-    return classInfo.fromDbJson(dbJson);
+    return _fromDbJson(dbJson);
   }
 
   @override
@@ -65,21 +93,21 @@ class CollectionMongo<T> extends Collection<T> {
     var mongo = selector.toMongo();
     var dbJson = await _collection.findOne(mongo);
     if (dbJson == null) return null;
-    return classInfo.fromDbJson(dbJson);
+    return _fromDbJson(dbJson);
   }
 
   @override
   Stream<T> find(SelectorBuilder selector) {
     var mongo = selector.toMongo();
-    return _collection.find(mongo).map(classInfo.fromDbJson);
+    return _collection.find(mongo).map(_fromDbJson);
   }
 
   @override
   Future<T> create(T object) async {
-    var dbJson = classInfo.toDbJson(object);
+    var dbJson = _toDbJson(object);
     // Insert modifies dbJson (adds _id).
     await _collection.insert(dbJson);
-    return classInfo.fromDbJson(dbJson);
+    return _fromDbJson(dbJson);
   }
 
   // Future<void> deleteOne(ObjectId id) async {
@@ -95,7 +123,7 @@ class CollectionMongo<T> extends Collection<T> {
         r'$match': {'operationType': 'insert'}
       }
     ]).map((changeEvent) {
-      return classInfo.fromDbJson(changeEvent.fullDocument);
+      return _fromDbJson(changeEvent.fullDocument);
     });
   }
 }
