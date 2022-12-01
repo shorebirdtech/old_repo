@@ -115,13 +115,31 @@ Future<List<EndpointDefinition>> collectEndpoints() async {
   return endpoints;
 }
 
+String _handlerName(String endpointName) {
+  return "${endpointName.substring(0, endpointName.length - "Endpoint".length)}Handler";
+}
+
 Library generateHandlers(List<EndpointDefinition> endpoints) {
   var library = LibraryBuilder();
+  final shorebirdUrl = 'package:shorebird/shorebird.dart';
 
-  for (var endpoint in endpoints) {
-    library.body.add(Class((builder) {
-      builder.name = endpoint.name;
-      builder.extend = refer('ShorebirdHandler');
+  for (var endpointDef in endpoints) {
+    library.body.add(Class((endpoint) {
+      endpoint.name = _handlerName(endpointDef.name);
+      endpoint.extend = refer('ShorebirdHandler', shorebirdUrl);
+
+      endpoint.fields.add(Field((field) {
+        field.name = 'endpoint';
+        field.modifier = FieldModifier.final$;
+        field.type = refer(endpointDef.name, endpointDef.path);
+      }));
+
+      endpoint.constructors.add(Constructor((c) {
+        c.requiredParameters.add(Parameter((p) {
+          p.name = 'endpoint';
+          p.type = refer(endpointDef.name, endpointDef.path);
+        }));
+      }));
     }));
   }
   return library.build();
@@ -136,13 +154,22 @@ class GenerateCommand extends Command {
 
   @override
   Future<void> run() async {
-    print('Generating source code...');
+    print('Analyzing source code...');
     var endpoints = await collectEndpoints();
-    print('Found ${endpoints.length} endpoints:');
+    print('Found ${endpoints.length} endpoint(s), generating handlers...');
     var handlers = generateHandlers(endpoints);
-    var emitter = DartEmitter();
-    var formatter = DartFormatter();
-    var output = formatter.format('${handlers.accept(emitter)}');
-    print(output);
+
+    var genDir = Directory('lib/gen/new');
+    if (!genDir.existsSync()) {
+      genDir.createSync();
+    }
+    writeLibrary(p.join(genDir.path, 'handlers.dart'), handlers);
   }
+}
+
+void writeLibrary(String path, Library library) {
+  var emitter = DartEmitter(useNullSafetySyntax: true);
+  var formatter = DartFormatter();
+  var output = formatter.format('${library.accept(emitter)}');
+  File(path).writeAsStringSync(output);
 }
