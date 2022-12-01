@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:shelf/shelf.dart' as shelf;
 
-import 'eventsource.dart';
+import '../eventsource.dart';
 
 shelf.Handler eventSourceHandler(
     {required Stream<Map<String, dynamic>> Function() createJsonStream}) {

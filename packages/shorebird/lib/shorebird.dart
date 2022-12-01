@@ -10,7 +10,7 @@ import "package:shelf_router/shelf_router.dart" as shelf_router;
 import 'package:shorebird/src/eventsource.dart';
 
 export 'package:shorebird/src/eventsource.dart';
-export 'package:shorebird/src/eventsource_handler.dart';
+export 'package:shorebird/src/handlers/eventsource_handler.dart';
 
 class RequestContext {}
 

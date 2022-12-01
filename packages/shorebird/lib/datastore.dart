@@ -3,9 +3,9 @@ import 'package:shorebird/datastore.dart';
 import 'package:shorebird/shorebird.dart';
 
 export 'package:mongo_dart/mongo_dart.dart' show ObjectId;
-export 'package:shorebird/src/datastore_mongo.dart' show DataStoreRemote;
-export 'package:shorebird/src/datastore_sembast.dart' show DataStoreLocal;
-export 'package:shorebird/src/selector_builder.dart';
+export 'package:shorebird/src/datastore/datastore_mongo.dart' show DataStoreRemote;
+export 'package:shorebird/src/datastore/datastore_sembast.dart' show DataStoreLocal;
+export 'package:shorebird/src/datastore/selector_builder.dart';
 
 class ObjectIdConverter extends JsonConverter<ObjectId, String> {
   const ObjectIdConverter();

@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 
-import '../datastore.dart';
+import '../../datastore.dart';
 
 class MongoJsonConverter {
   static Map<String, dynamic> toDbJson(Map<String, dynamic> json) {

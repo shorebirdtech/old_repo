@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
 
-import '../datastore.dart';
+import '../../datastore.dart';
 
 class IdSelector extends Selector {
   final ObjectId id;
