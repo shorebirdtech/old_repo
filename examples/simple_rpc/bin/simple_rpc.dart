@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:simple_rpc/gen/client.dart';
 import 'package:simple_rpc/model.dart';
+import 'package:simple_rpc/gen/client.dart';
 
 // This should be able to make an RPC call to the server
 // With auto-generated client and transport code.
@@ -28,4 +28,5 @@ void main(List<String> arguments) {
       }
     },
   );
+  // Does not ever exit, not sure why?
 }

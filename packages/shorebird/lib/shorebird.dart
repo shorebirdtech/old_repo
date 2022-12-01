@@ -1,10 +1,13 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:http/http.dart' as http;
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf_cors_headers/shelf_cors_headers.dart';
 import "package:shelf_router/shelf_router.dart" as shelf_router;
+import 'package:shorebird/src/eventsource.dart';
 
 export 'package:shorebird/src/eventsource.dart';
 export 'package:shorebird/src/eventsource_handler.dart';
@@ -64,42 +67,33 @@ class Server {
   }
 }
 
-// Could use https://pub.dev/packages/state_notifier/versions/0.7.0
-// But should just be able to use package:flutter/foundation.dart.
-class Watchable<T> {
-  Watchable(this._value);
+// Not sure if this is the correct abstraction.
+class Client {
+  final String baseUrl;
 
-  final List<void Function()> _listeners = [];
+  Client({this.baseUrl = 'http://localhost:3000'});
 
-  T get value => _value;
-  T _value;
-  set value(T newValue) {
-    if (_value == newValue) {
-      return;
+  Future<http.Response> post(String path, Map<String, dynamic> body) async {
+    var url = Uri.parse('$baseUrl/$path');
+    var headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    };
+    var response = await http
+        .post(
+          url,
+          headers: headers,
+          body: jsonEncode(body),
+        )
+        .timeout(const Duration(seconds: 5));
+    if (response.statusCode != 200) {
+      throw Exception('Error: ${response.statusCode} $path ${response.body}');
     }
-    _value = newValue;
-    notifyListeners();
+    return response;
   }
 
-  void addListener(void Function() listener) {
-    _listeners.add(listener);
-  }
-
-  void notifyListeners() {
-    for (var listener in _listeners) {
-      listener();
-    }
-  }
-
-  Stream<T> watch() {
-    StreamController<T> controller = StreamController<T>();
-    // FIXME: What should this do on pause/resume?
-    // https://github.com/dart-lang/sdk/issues/50446
-    controller.add(value);
-
-    addListener(() {
-      controller.add(value);
-    });
-    return controller.stream;
+  Stream<Map<String, dynamic>> watch(String path) {
+    var source = EventSource('$baseUrl/$path');
+    return source.stream.map((event) => jsonDecode(event.data));
   }
 }

@@ -21,8 +21,8 @@ class Event {
 class EventSource {
   final String url;
   late http.Client _client;
-  late StreamController _streamController;
-  late Stream stream;
+  late StreamController<Event> _streamController;
+  late Stream<Event> stream;
 
   EventSource(this.url) {
     _connect();
