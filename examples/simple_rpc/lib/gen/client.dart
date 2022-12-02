@@ -1,12 +1,13 @@
 import 'package:shorebird/shorebird.dart';
+import 'package:simple_rpc/gen/handlers.dart';
 
 import '../model.dart';
 
 export 'package:shorebird/shorebird.dart' show Client;
 
 extension SimpleRPCClient on Client {
-  Future<void> sendMessage(Message message) async {
-    await post('sendMessage', message.toJson());
+  Future<void> sendMessage(Message message, String stampColor) {
+    return post('sendMessage', SendMessageArgs(message, stampColor).toJson());
   }
 
   Stream<Message> newMessages() {

@@ -12,6 +12,11 @@ import 'package:shorebird/src/eventsource.dart';
 export 'package:shorebird/src/eventsource.dart';
 export 'package:shorebird/src/handlers/eventsource_handler.dart';
 
+// @Endpoint annotation.
+class Endpoint {
+  const Endpoint();
+}
+
 class RequestContext {}
 
 // HACK: Make AuthenticatedContext a separate type.
@@ -25,8 +30,6 @@ class Session {
 
   Session();
 }
-
-abstract class Endpoint {}
 
 class Router {
   final shelf_router.Router _router = shelf_router.Router();

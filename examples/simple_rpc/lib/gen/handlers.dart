@@ -6,28 +6,48 @@ import 'package:shorebird/shorebird.dart';
 import '../endpoints.dart';
 import '../model.dart';
 
-var allHandlers = <ShorebirdHandler>[
-  MessageHandler(MessageEndpoint()),
+final allHandlers = <ShorebirdHandler>[
+  MessageHandler(),
 ];
 
+// Wholly generated
+class SendMessageArgs {
+  final Message message;
+  final String stampColor;
+  SendMessageArgs(this.message, this.stampColor);
+
+  factory SendMessageArgs.fromJson(Map<String, dynamic> json) {
+    return SendMessageArgs(
+      Message.fromJson(json['message'] as Map<String, dynamic>),
+      json['stampColor'] as String,
+    );
+  }
+  Map<String, dynamic> toJson() {
+    return {
+      'message': message.toJson(),
+      'stampColor': stampColor,
+    };
+  }
+}
+
 class MessageHandler extends ShorebirdHandler {
-  MessageHandler(this.endpoint);
-
-  final MessageEndpoint endpoint;
-
   @override
   void collectRoutes(Router router) {
     router.addRoute('/sendMessage', (shelf.Request request) async {
-      var message = Message.fromJson(jsonDecode(await request.readAsString()));
-      await endpoint.sendMessage(message);
+      // Decode as args.
+      var args =
+          SendMessageArgs.fromJson(jsonDecode(await request.readAsString()));
+      // Then send the args to the message.
+      await sendMessage(RequestContext(), args.message, args.stampColor);
+      // Then reply with the result.
       return shelf.Response.ok('OK');
     });
 
+  // Special case when return type is Stream<T>
     router.addRoute(
         '/newMessages',
         eventSourceHandler(
-            createJsonStream: () =>
-                endpoint.newMessages().asyncMap((element) => element.toJson())),
-        method: 'GET');
+            createJsonStream: () => newMessages(RequestContext())
+                .asyncMap((element) => element.toJson())));
   }
 }

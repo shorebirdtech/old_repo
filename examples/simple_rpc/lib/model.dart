@@ -1,6 +1,10 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:shorebird/datastore.dart';
 
+// WANT: Ghost text in editor to show me the fromJson, toJson and other methods.
+// e.g. how Rust adds lots of ghost text.
+// The point of ghost text is to de-magic the generated code.
+
 part 'model.g.dart';
 
 // @Transportable

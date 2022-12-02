@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:simple_rpc/model.dart';
 import 'package:simple_rpc/gen/client.dart';
+import 'package:simple_rpc/model.dart';
 
 // This should be able to make an RPC call to the server
 // With auto-generated client and transport code.
@@ -18,9 +18,7 @@ void main(List<String> arguments) {
   Timer.periodic(
     Duration(seconds: 1),
     (Timer t) {
-      client.sendMessage(
-        Message('Hello, ${t.tick}!', DateTime.now()),
-      );
+      client.sendMessage(Message('Hello, ${t.tick}!', DateTime.now()), "blue");
       if (t.tick >= 5) {
         t.cancel();
         // Also stop listening for new messages so main can exit.

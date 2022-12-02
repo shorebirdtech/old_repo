@@ -8,6 +8,7 @@ import 'package:simple_rpc/gen/handlers.dart';
 import 'package:simple_rpc/gen/storable.dart';
 
 void main() async {
+  // FIXME: Pass this to the Server?  As part of a ServerContext?
   // This should just be a `shorebird run --local` command option?
   await DataStore.initSingleton(DataStoreLocal(classInfoMap, 'db.json'));
 

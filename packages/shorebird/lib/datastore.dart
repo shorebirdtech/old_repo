@@ -3,8 +3,10 @@ import 'package:shorebird/datastore.dart';
 import 'package:shorebird/shorebird.dart';
 
 export 'package:mongo_dart/mongo_dart.dart' show ObjectId;
-export 'package:shorebird/src/datastore/datastore_mongo.dart' show DataStoreRemote;
-export 'package:shorebird/src/datastore/datastore_sembast.dart' show DataStoreLocal;
+export 'package:shorebird/src/datastore/datastore_mongo.dart'
+    show DataStoreRemote;
+export 'package:shorebird/src/datastore/datastore_sembast.dart'
+    show DataStoreLocal;
 export 'package:shorebird/src/datastore/selector_builder.dart';
 
 class ObjectIdConverter extends JsonConverter<ObjectId, String> {
@@ -27,7 +29,7 @@ class ClassInfo<T> {
   // final Map<String, dynamic> Function(T) toDbJson;
 
   // Cannot be a method on T because it's a static.
-  final T Function(Map<String, dynamic> dbJson) fromJson;
+  final T Function(Map<String, dynamic> json) fromJson;
   // Could be a method on T, if we required a baseclass.
   final Map<String, dynamic> Function(T) toJson;
 

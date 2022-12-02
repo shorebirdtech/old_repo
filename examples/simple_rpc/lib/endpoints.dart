@@ -3,15 +3,22 @@ import 'package:shorebird/shorebird.dart';
 
 import 'model.dart';
 
-class MessageEndpoint extends Endpoint {
-  // Shouldn't these take a request context?
-  Future<void> sendMessage(Message message) async {
-    // Record the message in the datastore.
-    await DataStore.instance.collection<Message>().create(message);
-  }
+// What are the rules of the road for globals?
+// Suggestion: Globals are "local" to a given instance of the server.
 
-  Stream<Message> newMessages() {
-    // Return a stream of messages from the datastore.
-    return DataStore.instance.collection<Message>().watchAdditions();
-  }
+// Going to need: a coherent memcache + datastore.
+
+// or @Entrypoint
+@Endpoint()
+Future<void> sendMessage(
+    RequestContext context, Message message, String stampColor) {
+  // stampColor is just to have a second argument.
+  // Record the message in the datastore.
+  return DataStore.of(context).collection<Message>().create(message);
+}
+
+@Endpoint()
+Stream<Message> newMessages(AuthenticatedContext context) {
+  // Return a stream of messages from the datastore.
+  return DataStore.of(context).collection<Message>().watchAdditions();
 }
