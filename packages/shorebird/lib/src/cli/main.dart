@@ -1,6 +1,6 @@
 import 'package:args/command_runner.dart';
 
-import 'generate.dart';
+import 'generate/command.dart';
 
 void main(List<String> args) async {
   var runner =

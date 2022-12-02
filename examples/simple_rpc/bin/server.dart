@@ -3,7 +3,7 @@
 import 'dart:io';
 
 import 'package:shorebird/datastore.dart';
-import 'package:shorebird/shorebird.dart';
+import 'package:shorebird/server.dart';
 import 'package:simple_rpc/gen/handlers.dart';
 import 'package:simple_rpc/gen/storable.dart';
 

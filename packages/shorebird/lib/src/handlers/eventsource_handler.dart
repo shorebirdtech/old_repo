@@ -1,13 +1,15 @@
 import 'dart:convert';
 
 import 'package:shelf/shelf.dart' as shelf;
+import 'package:shorebird/shorebird.dart';
 
 import '../eventsource.dart';
 
 shelf.Handler eventSourceHandler(
-    {required Stream<Map<String, dynamic>> Function() createJsonStream}) {
+    {required Stream<Map<String, dynamic>> Function(RequestContext context)
+        createJsonStream}) {
   return (shelf.Request request) {
-    Stream stream = createJsonStream();
+    Stream stream = createJsonStream(RequestContext());
 
     request.hijack((channel) {
       // Is there a better way to write these headers?

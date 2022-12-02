@@ -19,6 +19,7 @@ dependencies:
   path: ^1.8.2
   code_builder: ^4.3.0
   dart_style: ^2.2.4
+  source_gen: ^1.2.6
 
 dev_dependencies:
   lints: ^2.0.0

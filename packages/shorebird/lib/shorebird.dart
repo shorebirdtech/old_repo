@@ -1,16 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:http/http.dart' as http;
-import 'package:shelf/shelf.dart';
-import 'package:shelf/shelf_io.dart' as shelf_io;
-import 'package:shelf_cors_headers/shelf_cors_headers.dart';
-import "package:shelf_router/shelf_router.dart" as shelf_router;
-import 'package:shorebird/src/eventsource.dart';
 
-export 'package:shorebird/src/eventsource.dart';
-export 'package:shorebird/src/handlers/eventsource_handler.dart';
+import 'package:shorebird/src/eventsource.dart';
 
 // @Endpoint annotation.
 class Endpoint {
@@ -29,45 +22,6 @@ class Session {
   }
 
   Session();
-}
-
-class Router {
-  final shelf_router.Router _router = shelf_router.Router();
-  void addRoute(String path, Handler handler, {String method = 'POST'}) {
-    _router.add(method, path, handler);
-  }
-
-  shelf_router.Router shelfHandler() => _router;
-}
-
-abstract class ShorebirdHandler {
-  void collectRoutes(Router router);
-}
-
-class Server {
-  late final HttpServer server;
-
-  // FIXME: These are kinda hacky, they can't be called until serve is
-  // called and only if serve was awaited.
-  int get port => server.port;
-  InternetAddress get address => server.address;
-
-  Future<void> serve(
-      List<ShorebirdHandler> endpoints, Object host, int port) async {
-    var router = Router();
-    for (var endpoint in endpoints) {
-      endpoint.collectRoutes(router);
-    }
-
-    var handler = const Pipeline()
-        .addMiddleware(logRequests())
-        .addMiddleware(corsHeaders())
-        .addHandler(router.shelfHandler());
-    server = await shelf_io.serve(handler, host, port);
-
-    // Enable content compression
-    server.autoCompress = true;
-  }
 }
 
 // Not sure if this is the correct abstraction.
