@@ -18,17 +18,16 @@ class Event {
   const Event(this.data);
 }
 
+// It's not clear why this is a class and not just a free function.
+// I guess you might want it a class to handle reconnects?
 class EventSource {
   final String url;
   late http.Client _client;
   late StreamController<Event> _streamController;
   late Stream<Event> stream;
 
-  EventSource(this.url) {
-    _connect();
-  }
-
-  void _connect() {
+  EventSource.connect(this.url,
+      [Map<String, dynamic> body = const <String, dynamic>{}]) {
     _client = http.Client();
     _streamController = StreamController<Event>();
     // We would only use GET if we wanted to allow the network layer to cache.

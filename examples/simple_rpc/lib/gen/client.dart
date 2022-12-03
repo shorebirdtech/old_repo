@@ -11,6 +11,6 @@ extension SimpleRPCClient on Client {
   }
 
   Stream<Message> newMessages() {
-    return watch('newMessages').map((value) => Message.fromJson(value));
+    return watch('newMessages').map(Message.fromJson);
   }
 }

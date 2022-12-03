@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-
 import 'package:shorebird/src/eventsource.dart';
 
 // @Endpoint annotation.
@@ -30,7 +29,8 @@ class Client {
 
   Client({this.baseUrl = 'http://localhost:3000'});
 
-  Future<http.Response> post(String path, Map<String, dynamic> body) async {
+  Future<http.Response> post(String path,
+      [Map<String, dynamic> body = const <String, dynamic>{}]) async {
     var url = Uri.parse('$baseUrl/$path');
     var headers = {
       'Content-Type': 'application/json',
@@ -49,8 +49,9 @@ class Client {
     return response;
   }
 
-  Stream<Map<String, dynamic>> watch(String path) {
-    var source = EventSource('$baseUrl/$path');
+  Stream<Map<String, dynamic>> watch(String path,
+      [Map<String, dynamic> body = const <String, dynamic>{}]) {
+    var source = EventSource.connect('$baseUrl/$path', body);
     return source.stream.map((event) => jsonDecode(event.data));
   }
 }
