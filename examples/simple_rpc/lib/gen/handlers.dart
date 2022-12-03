@@ -33,6 +33,7 @@ final allHandlers = [
   ),
   Handler.stream(
     'newMessages',
-    (context) => newMessages(context).asyncMap((element) => element.toJson()),
+    (context, body) =>
+        newMessages(context).asyncMap((element) => element.toJson()),
   )
 ];

@@ -17,7 +17,7 @@ class Handler {
 
   factory Handler.simpleCall(
       String name,
-      Future<void> Function(RequestContext context, Map<String, dynamic>)
+      Future<void> Function(RequestContext context, Map<String, dynamic> body)
           onRequest) {
     return Handler(
       name: name,
@@ -27,7 +27,8 @@ class Handler {
 
   factory Handler.stream(
       String name,
-      Stream<Map<String, dynamic>> Function(RequestContext context)
+      Stream<Map<String, dynamic>> Function(
+              RequestContext context, Map<String, dynamic> body)
           createJsonStream) {
     return Handler(
       name: name,

@@ -5,11 +5,14 @@ import 'package:shorebird/shorebird.dart';
 
 import '../eventsource.dart';
 
-shelf.Handler eventSourceHandler(
-    {required Stream<Map<String, dynamic>> Function(RequestContext context)
-        createJsonStream}) {
-  return (shelf.Request request) {
-    Stream stream = createJsonStream(RequestContext());
+shelf.Handler eventSourceHandler({
+  required Stream<Map<String, dynamic>> Function(
+          RequestContext context, Map<String, dynamic> body)
+      createJsonStream,
+}) {
+  return (shelf.Request request) async {
+    Stream stream = createJsonStream(
+        RequestContext(), jsonDecode(await request.readAsString()));
 
     request.hijack((channel) {
       // Is there a better way to write these headers?
