@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:shorebird/annotations.dart';
 import 'package:shorebird/datastore.dart';
 import 'package:shorebird/shorebird.dart';
 
@@ -9,6 +10,9 @@ export 'package:shorebird/src/datastore/datastore_sembast.dart'
     show DataStoreLocal;
 export 'package:shorebird/src/datastore/selector_builder.dart';
 
+/// Annotation for json_serializable to generate a fromJson and toJson method
+/// for ObjectId
+/// Should be removed once [Storable] is implemented.
 class ObjectIdConverter extends JsonConverter<ObjectId, String> {
   const ObjectIdConverter();
 
@@ -19,6 +23,8 @@ class ObjectIdConverter extends JsonConverter<ObjectId, String> {
   String toJson(ObjectId object) => object.toHexString();
 }
 
+/// Used to lookup type information for a given class.  One will be generated
+/// for each class annotated with [Transportable] or [Storable].
 class ClassInfo<T> {
   final Type type;
   // Cannot be a static on T as far as I know.

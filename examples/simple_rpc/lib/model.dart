@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:shorebird/annotations.dart';
 import 'package:shorebird/datastore.dart';
 
 // WANT: Ghost text in editor to show me the fromJson, toJson and other methods.
@@ -7,7 +8,8 @@ import 'package:shorebird/datastore.dart';
 
 part 'model.g.dart';
 
-// @Transportable
+@Transportable()
+@Storable()
 @ObjectIdConverter()
 @JsonSerializable(constructor: '_')
 class Message {

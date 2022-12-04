@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:analyzer/dart/analysis/analysis_context_collection.dart';
 import 'package:args/command_runner.dart';
 import 'package:code_builder/code_builder.dart';
 import 'package:dart_style/dart_style.dart';
@@ -8,6 +9,7 @@ import 'package:path/path.dart' as p;
 import 'collect.dart';
 import 'generate_client.dart';
 import 'generate_handlers.dart';
+import 'generate_storable.dart';
 
 class GenerateCommand extends Command {
   GenerateCommand() {
@@ -24,20 +26,26 @@ class GenerateCommand extends Command {
   @override
   Future<void> run() async {
     print('Analyzing source code...');
-    var endpoints = await collectEndpoints();
-    print('Found ${endpoints.length} endpoint(s), generating handlers...');
+    var collection =
+        AnalysisContextCollection(includedPaths: [Directory.current.path]);
+    var result = await collectAnnotations(collection);
+    print(
+        'Found ${result.endpoints.length} endpoint(s), generating handlers...');
 
     var genDir = Directory('lib/gen/new');
     if (!genDir.existsSync()) {
       genDir.createSync();
     }
     bool format = argResults!['format'] as bool;
-    var handlers = generateHandlers(endpoints);
+    var handlers = generateHandlers(result.endpoints);
     writeLibrary(p.join(genDir.path, 'handlers.dart'), handlers,
         format: format);
 
-    var client = generateClient(endpoints);
+    var client = generateClient(result.endpoints);
     writeLibrary(p.join(genDir.path, 'client.dart'), client, format: format);
+
+    var models = generateStorable(result.models);
+    writeLibrary(p.join(genDir.path, 'storable.dart'), models, format: format);
   }
 }
 

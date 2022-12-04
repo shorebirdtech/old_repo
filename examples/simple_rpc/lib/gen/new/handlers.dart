@@ -5,6 +5,7 @@ import 'package:shorebird/handler.dart';
 import 'package:simple_rpc/model.dart';
 
 import '../../endpoints.dart';
+import 'handlers.dart';
 
 class SendmessageArgs {
   SendmessageArgs(

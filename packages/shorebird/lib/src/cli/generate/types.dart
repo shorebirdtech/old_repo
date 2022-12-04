@@ -16,6 +16,18 @@ class TypeDefinition {
         url = dartType.element?.librarySource?.uri.toString();
 }
 
+class ClassDefinition {
+  final String name;
+  final TypeDefinition type;
+  final List<FieldDefinition> fields;
+
+  ClassDefinition({
+    required this.name,
+    required this.type,
+    required this.fields,
+  });
+}
+
 // Top-level functions used as endpoints.
 class FunctionDefinition {
   final String name;
@@ -31,6 +43,16 @@ class FunctionDefinition {
     required this.path,
     required this.returnType,
     required this.args,
+  });
+}
+
+class FieldDefinition {
+  final String name;
+  final TypeDefinition type;
+
+  FieldDefinition({
+    required this.name,
+    required this.type,
   });
 }
 

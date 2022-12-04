@@ -10,7 +10,7 @@ class MongoJsonConverter {
     if (id == null || id is! String) {
       throw Exception('Missing id in json');
     }
-    json['_id'] = ObjectId.fromHexString(id);
+    json['_id'] = mongo.ObjectId.fromHexString(id);
     json.remove('id');
     return json;
   }
