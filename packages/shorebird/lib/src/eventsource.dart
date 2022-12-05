@@ -34,6 +34,7 @@ class EventSource {
     var request = http.Request('POST', uri);
     request.headers['Accept'] = 'text/event-stream';
     request.headers['Cache-Control'] = 'no-cache';
+    request.body = jsonEncode(body);
     var response = _client.send(request);
     response.asStream().listen((response) {
       response.stream.transform(utf8.decoder).transform(LineSplitter()).listen(

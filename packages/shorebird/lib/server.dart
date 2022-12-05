@@ -16,6 +16,11 @@ class Server {
   InternetAddress get address => server.address;
 
   Future<void> serve(List<Handler> handlers, Object host, int port) async {
+    // Logging from within the child process so we can get the pid.
+    // This is to work around the current pid mismatch between what
+    // shorebird run sees and what the child process sees.
+    print("Starting server in $pid on $host:$port...");
+
     var router = shelf_router.Router();
     for (var handler in handlers) {
       router.add(handler.method, handler.path, handler.onRequest);

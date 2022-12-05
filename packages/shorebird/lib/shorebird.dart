@@ -30,7 +30,10 @@ class Client {
   /// Post a request to the server.
   Future<http.Response> post(String path,
       [Map<String, dynamic> body = const <String, dynamic>{}]) async {
-    var url = Uri.parse('$baseUrl/$path');
+    if (!path.startsWith('/')) {
+      throw ArgumentError.value(path, 'path', 'Must start with /');
+    }
+    var url = Uri.parse('$baseUrl$path').normalizePath();
     var headers = {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
