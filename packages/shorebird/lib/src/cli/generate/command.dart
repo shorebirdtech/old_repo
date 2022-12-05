@@ -33,11 +33,13 @@ class GenerateCommand extends Command {
     print(
         'Found ${result.endpoints.length} endpoint(s), generating handlers...');
 
-    var writer = _LibraryWriter('lib/gen/new',
+    final genLocation = 'lib/gen';
+    print('Generating source code into $genLocation...');
+    var writer = _LibraryWriter(genLocation,
         formatOutput: argResults!['format'] as bool);
     writer.writeLibrary('handlers.dart', generateHandlers(result.endpoints));
     writer.writeLibrary('client.dart', generateClient(result.endpoints));
-    writer.writeLibrary('models.dart', generateStorable(result.models));
+    writer.writeLibrary('storable.dart', generateStorable(result.models));
     writer.writeLibrary('local_server.dart', generateServer());
   }
 }

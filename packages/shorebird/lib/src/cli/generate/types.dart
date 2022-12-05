@@ -76,7 +76,7 @@ class ReturnDefinition {
 
 // Generation helpers (is this a separate file?)
 
-final importPrefix = '../..';
+final importPrefix = '..'; // Assume imports are relative to the gen diretory.
 final handlerUrl = 'package:shorebird/handler.dart';
 final shorebirdUrl = 'package:shorebird/shorebird.dart';
 
@@ -95,6 +95,8 @@ extension EndpointGeneration on FunctionDefinition {
   String get argsClassName {
     return '${name.capitalize()}Args';
   }
+
+  String get handlerPath => '/$name';
 
   Reference get argsTypeReference => refer(argsClassName, 'handlers.dart');
 

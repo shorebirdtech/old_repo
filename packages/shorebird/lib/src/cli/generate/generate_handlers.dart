@@ -2,6 +2,24 @@ import 'package:code_builder/code_builder.dart';
 
 import 'types.dart';
 
+Expression _argFromJson(ParameterDefinition arg) {
+  if (arg.type.isPrimitive) {
+    return refer('json').index(literalString(arg.name)).asA(arg.typeReference);
+  } else {
+    return arg.typeReference
+        .property('fromJson')
+        .call([refer('json').index(literalString(arg.name))]);
+  }
+}
+
+Expression _argToJson(ParameterDefinition arg) {
+  if (arg.type.isPrimitive) {
+    return refer(arg.name);
+  } else {
+    return refer(arg.name).property('toJson').call([]);
+  }
+}
+
 Spec _generateArgsClass(FunctionDefinition endpoint) {
   var args = endpoint.serializedArgs;
   if (args.isEmpty) {
@@ -27,17 +45,13 @@ Spec _generateArgsClass(FunctionDefinition endpoint) {
       ..name = 'json'
       ..type = refer('Map<String, dynamic>')))
     ..initializers.addAll(args.map((arg) {
-      return Code('''${arg.name} = json['${arg.name}'] as ${arg.type.name}''');
+      return refer(arg.name).assign(_argFromJson(arg)).code;
     }))));
 
   argsClass.methods.add(Method((b) => b
     ..name = 'toJson'
     ..returns = refer('Map<String, dynamic>')
-    ..body = Code('''
-        return {
-          ${args.map((arg) => "'${arg.name}': ${arg.name}").join(',\n')}
-        };
-      ''')));
+    ..body = literalMap({for (var a in args) a.name: _argToJson(a)}).code));
   return argsClass.build();
 }
 
@@ -79,7 +93,7 @@ Code _handlerForEndpoint(FunctionDefinition endpoint) {
 
   if (endpoint.returnsStream) {
     return refer('Handler', handlerUrl).property('stream').call([
-      literalString(endpoint.name),
+      literalString(endpoint.handlerPath),
       Method((f) {
         f.requiredParameters.addAll(handlerParameters);
         f.body = Block.of([
@@ -101,7 +115,7 @@ Code _handlerForEndpoint(FunctionDefinition endpoint) {
     ]).code;
   } else {
     return refer('Handler', handlerUrl).property('simpleCall').call([
-      literalString(endpoint.name),
+      literalString(endpoint.handlerPath),
       Method((f) {
         f.requiredParameters.addAll(handlerParameters);
         f.modifier = MethodModifier.async;

@@ -33,12 +33,12 @@ Library generateStorable(List<ClassDefinition> models) {
   }
 
   library.body.add(
-    Field(
-      (b) => b
-        ..name = 'classInfoMap'
-        ..type = refer('Map<Type, ClassInfo>', classInfoUrl)
-        ..assignment = literalMap(typeToClassInfo).code,
-    ),
+    Field((f) {
+      f.name = 'classInfoMap';
+      f.type = refer('Map<Type, ClassInfo>', classInfoUrl);
+      f.assignment = literalMap(typeToClassInfo).code;
+      f.modifier = FieldModifier.final$;
+    }),
   );
   return library.build();
 }

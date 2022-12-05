@@ -51,7 +51,9 @@ class Client {
   /// Watch a stream of events from the server.
   Stream<Map<String, dynamic>> watch(String path,
       [Map<String, dynamic> body = const <String, dynamic>{}]) {
-    var source = EventSource.connect('$baseUrl/$path', body);
+    var uri = Uri.parse(baseUrl);
+    uri = uri.resolve(path);
+    var source = EventSource.connect(uri, body);
     return source.stream.map((event) => jsonDecode(event.data));
   }
 }

@@ -25,7 +25,7 @@ Method _clientMethodForEndpoint(FunctionDefinition endpoint) {
       body,
       refer('watch')
           .call([
-            literalString(endpoint.name),
+            literalString(endpoint.handlerPath),
             if (endpoint.serializedArgs.isNotEmpty) refer('body'),
           ])
           .property('map')
@@ -38,7 +38,7 @@ Method _clientMethodForEndpoint(FunctionDefinition endpoint) {
       body,
       refer('post')
           .call([
-            literalString(endpoint.name),
+            literalString(endpoint.handlerPath),
             if (endpoint.serializedArgs.isNotEmpty) refer('body'),
           ])
           .returned
@@ -51,6 +51,8 @@ Method _clientMethodForEndpoint(FunctionDefinition endpoint) {
 Library generateClient(List<FunctionDefinition> endpoints) {
   final clientUrl = 'package:shorebird/shorebird.dart';
   var library = LibraryBuilder();
+
+  library.directives.add(Directive.export(clientUrl, show: ['Client']));
 
   var client = ExtensionBuilder()
     ..name = 'HandlerExtensions'

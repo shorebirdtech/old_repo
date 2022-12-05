@@ -6,32 +6,32 @@ import 'shorebird.dart';
 
 // Move to a code-gen internal "handlers.dart" include instead.
 class Handler {
-  final String name;
+  final String path;
   final shelf.Handler onRequest;
   final String method;
   Handler({
-    required this.name,
+    required this.path,
     required this.onRequest,
     this.method = 'POST',
   });
 
   factory Handler.simpleCall(
-      String name,
+      String path,
       Future<void> Function(RequestContext context, Map<String, dynamic> body)
           onRequest) {
     return Handler(
-      name: name,
+      path: path,
       onRequest: simpleCall(onRequest),
     );
   }
 
   factory Handler.stream(
-      String name,
+      String path,
       Stream<Map<String, dynamic>> Function(
               RequestContext context, Map<String, dynamic> body)
           createJsonStream) {
     return Handler(
-      name: name,
+      path: path,
       onRequest: eventSourceHandler(createJsonStream: createJsonStream),
     );
   }

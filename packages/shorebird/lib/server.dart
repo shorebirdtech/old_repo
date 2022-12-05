@@ -18,7 +18,7 @@ class Server {
   Future<void> serve(List<Handler> handlers, Object host, int port) async {
     var router = shelf_router.Router();
     for (var handler in handlers) {
-      router.add(handler.method, handler.name, handler.onRequest);
+      router.add(handler.method, handler.path, handler.onRequest);
     }
 
     var handler = const shelf.Pipeline()

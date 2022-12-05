@@ -21,17 +21,17 @@ class Event {
 // It's not clear why this is a class and not just a free function.
 // I guess you might want it a class to handle reconnects?
 class EventSource {
-  final String url;
+  final Uri uri;
   late http.Client _client;
   late StreamController<Event> _streamController;
   late Stream<Event> stream;
 
-  EventSource.connect(this.url,
+  EventSource.connect(this.uri,
       [Map<String, dynamic> body = const <String, dynamic>{}]) {
     _client = http.Client();
     _streamController = StreamController<Event>();
     // We would only use GET if we wanted to allow the network layer to cache.
-    var request = http.Request('POST', Uri.parse(url));
+    var request = http.Request('POST', uri);
     request.headers['Accept'] = 'text/event-stream';
     request.headers['Cache-Control'] = 'no-cache';
     var response = _client.send(request);
