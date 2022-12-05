@@ -1,6 +1,9 @@
 Main package for Shorebird
 
-## Installation
+This package is a work in progress.  If you're interested in using it, please
+join us on Discord: https://discord.gg/9hKJcWGcaB
+
+# Installation
 
 ```
 dart pub global activate shorebird
@@ -8,7 +11,7 @@ shorebird generate
 shorebird run
 ```
 
-## Usage
+# Usage
 
 @Endpoint annotations are used to mark functions that should be exposed
 as serverless functions.  The function must return a Future or a Stream.
@@ -67,9 +70,7 @@ void main() {
 }
 ```
 
-# Notes
-
-## Known issues
+# Known issues
 - `shorebird run` does not (yet) call `shorebird generate` before running.
   This means that if you change Endpoints, Storable, or Transportable classes
   you need to run `shorebird generate` manually before running.
@@ -77,3 +78,8 @@ void main() {
   is not the same as the pid the process itself sees.  I think this happens
   because `dart run` is a wrapper, which exits leaving the child process
   with a differnet pid.
+- `shorebird` CLI dependencies are currently present in package:shorebird's
+  pubspec.yaml.  It's possible they can all be moved to dev_dependencies
+  Regardless they probably should end up in a separate (shorebird_cli?) package.
+- @Storable and @Transportable do not yet generate toJson/fromJson methods.
+  Should be easy to fix, for now classes use json_serializable.
