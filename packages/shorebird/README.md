@@ -83,3 +83,11 @@ void main() {
   Regardless they probably should end up in a separate (shorebird_cli?) package.
 - @Storable and @Transportable do not yet generate toJson/fromJson methods.
   Should be easy to fix, for now classes use json_serializable.
+
+
+## Deploy Design
+- A server somewhere that can handle vhost requests and route urls to the
+  correct port. MVP: A single server which can show two different apps.
+- A server that can handle deploy requests and build images (docker) for an app.
+  MVP: A single server that can build an app and put it somewhere.
+- How are databases set-up/deployed?
