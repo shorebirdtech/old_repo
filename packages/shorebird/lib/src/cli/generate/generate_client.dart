@@ -3,7 +3,8 @@ import 'package:code_builder/code_builder.dart';
 import 'types.dart';
 
 Method _clientMethodForEndpoint(FunctionDefinition endpoint) {
-  var body = endpoint.serializedArgs.isEmpty
+  // If the endpoint has args, build an Args class and serialize it.
+  var assignArgs = endpoint.serializedArgs.isEmpty
       ? Code('')
       : declareFinal('body')
           .assign(endpoint.argsTypeReference
@@ -12,6 +13,35 @@ Method _clientMethodForEndpoint(FunctionDefinition endpoint) {
               .call([]))
           .statement;
 
+  var fromJsonMethod = endpoint.innerReturnType.fromJsonMethod;
+  // Call the right client method based on the endpoint's return type.
+  late Expression call;
+  if (endpoint.returnsStream) {
+    call = refer('watch')
+        .call([
+          literalString(endpoint.handlerPath),
+          if (endpoint.serializedArgs.isNotEmpty) refer('body'),
+        ])
+        .property('map')
+        .call([fromJsonMethod]);
+  } else {
+    // Returns Future<T>
+    call = refer('post').call([
+      literalString(endpoint.handlerPath),
+      if (endpoint.serializedArgs.isNotEmpty) refer('body'),
+    ]);
+    var resultType = endpoint.innerReturnType;
+    if (!resultType.isVoid) {
+      call = call
+          .property('then')
+          .call([
+            refer('extractResponse<${resultType.networkTypeReference.symbol}>',
+                shorebirdUrl)
+          ])
+          .property('then')
+          .call([fromJsonMethod]);
+    }
+  }
   var method = MethodBuilder();
   method.name = endpoint.name;
   method.returns = endpoint.returnTypeReference;
@@ -20,31 +50,10 @@ Method _clientMethodForEndpoint(FunctionDefinition endpoint) {
       ..name = arg.name
       ..type = arg.typeReference);
   }));
-  if (endpoint.returnsStream) {
-    method.body = Block.of([
-      body,
-      refer('watch')
-          .call([
-            literalString(endpoint.handlerPath),
-            if (endpoint.serializedArgs.isNotEmpty) refer('body'),
-          ])
-          .property('map')
-          .call([endpoint.innserReturnTypeReference.property('fromJson')])
-          .returned
-          .statement,
-    ]);
-  } else {
-    method.body = Block.of([
-      body,
-      refer('post')
-          .call([
-            literalString(endpoint.handlerPath),
-            if (endpoint.serializedArgs.isNotEmpty) refer('body'),
-          ])
-          .returned
-          .statement,
-    ]);
-  }
+  method.body = Block.of([
+    assignArgs,
+    call.returned.statement,
+  ]);
   return method.build();
 }
 

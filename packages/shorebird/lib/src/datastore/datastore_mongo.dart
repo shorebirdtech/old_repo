@@ -110,6 +110,19 @@ class CollectionMongo<T> extends Collection<T> {
     return _fromDbJson(dbJson);
   }
 
+  @override
+  Future<void> update(ObjectId id, T Function(T) update) async {
+    // This should use a transaction.
+    var dbJson = await _collection.findOne(where.id(id).toMongo());
+    if (dbJson == null) {
+      throw Exception('Object not found: $id');
+    }
+    var object = _fromDbJson(dbJson);
+    var updatedObject = update(object);
+    var updatedDbJson = _toDbJson(updatedObject);
+    await _collection.update(where.id(id).toMongo(), updatedDbJson);
+  }
+
   // Future<void> deleteOne(ObjectId id) async {
   //   await _collection.remove(where.id(id));
   // }

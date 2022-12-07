@@ -10,10 +10,20 @@ class TypeDefinition {
   // Not sure if this is the correct heuristic.  It's used for deciding
   // if we need to call fromJson or just cast.
   bool get isPrimitive => url == null || url == 'dart:core';
+  bool get isVoid => dartType.isVoid;
 
   TypeDefinition.fromDartType(this.dartType)
       : name = dartType.getDisplayString(withNullability: false),
-        url = dartType.element?.librarySource?.uri.toString();
+        url = urlFromDartType(dartType);
+
+  static String? urlFromDartType(DartType dartType) {
+    // There must be a better way to implement this hack.
+    // I want the library which *exported* the type, not where it was defined.
+    if (dartType.element?.name == 'ObjectId') {
+      return 'package:shorebird/datastore.dart';
+    }
+    return dartType.element?.librarySource?.uri.toString();
+  }
 }
 
 class ClassDefinition {
@@ -102,13 +112,10 @@ extension EndpointGeneration on FunctionDefinition {
 
   bool get returnsStream => returnType.dartType.isDartAsyncStream;
 
-  Reference get innserReturnTypeReference {
-    var innerType =
-        (returnType.dartType as ParameterizedType).typeArguments.first;
-    var definition = TypeDefinition.fromDartType(innerType);
-    return refer(definition.name, definition.url);
-  }
+  TypeDefinition get innerReturnType => TypeDefinition.fromDartType(
+      (returnType.dartType as ParameterizedType).typeArguments.first);
 
+  Reference get innerReturnTypeReference => innerReturnType.typeReference;
   Reference get reference => refer(name, url);
   Reference get returnTypeReference => returnType.typeReference;
 }
@@ -120,6 +127,29 @@ extension TypeGeneration on TypeDefinition {
     } else {
       return refer(name, url);
     }
+  }
+
+  Expression get fromJsonMethod {
+    // This is hard-coded until we have some sort of JsonKey support.
+    if (name == 'ObjectId') {
+      return typeReference.property('fromHexString');
+    }
+    return typeReference.property('fromJson');
+  }
+
+  // Hack for ObjectId having a toJson but not returning a Map.
+  bool get isPrimitiveNetworkType {
+    return isPrimitive || name == 'ObjectId';
+  }
+
+  Reference get networkTypeReference {
+    if (name == 'ObjectId') {
+      return refer('String');
+    }
+    if (isPrimitive) {
+      return typeReference;
+    }
+    return refer('Map<String, dynamic>');
   }
 }
 

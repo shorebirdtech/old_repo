@@ -18,10 +18,6 @@ include: package:lints/recommended.yaml
 linter:
   rules:
     - unawaited_futures
-# analyzer:
-#   exclude:
-#     - path/to/excluded/files/**
-
 # For more information about the core and recommended set of lints, see
 # https://dart.dev/go/core-lints
 

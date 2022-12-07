@@ -6,8 +6,7 @@ Expression _argFromJson(ParameterDefinition arg) {
   if (arg.type.isPrimitive) {
     return refer('json').index(literalString(arg.name)).asA(arg.typeReference);
   } else {
-    return arg.typeReference
-        .property('fromJson')
+    return arg.type.fromJsonMethod
         .call([refer('json').index(literalString(arg.name))]);
   }
 }
@@ -114,15 +113,33 @@ Code _handlerForEndpoint(FunctionDefinition endpoint) {
       }).closure
     ]).code;
   } else {
+    var endpointCall = endpoint.reference.call(endpointArgs).awaited;
     return refer('Handler', handlerUrl).property('simpleCall').call([
       literalString(endpoint.handlerPath),
       Method((f) {
         f.requiredParameters.addAll(handlerParameters);
         f.modifier = MethodModifier.async;
-        f.body = Block.of([
-          argsFromJson,
-          endpoint.reference.call(endpointArgs).awaited.returned.statement,
-        ]);
+        f.body = Block((b) {
+          b.statements.add(argsFromJson);
+          if (endpoint.innerReturnType.isVoid) {
+            b.addExpression(endpointCall);
+            b.addExpression(refer('Response', shorebirdUrl)
+                .property('ok')
+                .call([]).returned);
+          } else {
+            b.addExpression(declareFinal('result').assign(endpointCall));
+            var jsonResult = refer('result').property('toJson').call([]);
+            if (endpoint.innerReturnType.isPrimitiveNetworkType) {
+              b.addExpression(refer('Response', shorebirdUrl)
+                  .property('primitive')
+                  .call([jsonResult]).returned);
+            } else {
+              b.addExpression(refer('Response', shorebirdUrl)
+                  .property('json')
+                  .call([jsonResult]).returned);
+            }
+          }
+        });
       }).closure
     ]).code;
   }

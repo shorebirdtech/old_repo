@@ -4,6 +4,14 @@ import 'package:shorebird/src/handlers/simple_call.dart';
 
 import 'shorebird.dart';
 
+class Response {
+  Map<String, dynamic> responseJson;
+
+  Response.ok() : responseJson = {};
+  Response.primitive(dynamic value) : responseJson = {'result': value};
+  Response.json(Map<String, dynamic> json) : responseJson = {'result': json};
+}
+
 // Move to a code-gen internal "handlers.dart" include instead.
 class Handler {
   final String path;
@@ -17,7 +25,8 @@ class Handler {
 
   factory Handler.simpleCall(
       String path,
-      Future<void> Function(RequestContext context, Map<String, dynamic> body)
+      Future<Response> Function(
+              RequestContext context, Map<String, dynamic> body)
           onRequest) {
     return Handler(
       path: path,

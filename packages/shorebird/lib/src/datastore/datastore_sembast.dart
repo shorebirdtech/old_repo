@@ -103,6 +103,8 @@ class CollectionSembast<T> extends Collection<T> {
 
   Map<String, dynamic> _toDbJson(T value) {
     var json = classInfo.toJson(value);
+    // This ignores the passed id, which is different than what mongo does.
+    // https://www.mongodb.com/docs/manual/reference/method/db.collection.insert/
     json.remove('id');
     return json;
   }
@@ -132,9 +134,26 @@ class CollectionSembast<T> extends Collection<T> {
 
   @override
   Future<T> create(T object) async {
-    var dbJson = _toDbJson(object);
+    // This ignores the passed id, which is different than what mongo does.
+    // https://www.mongodb.com/docs/manual/reference/method/db.collection.insert/
+    var dbJson = _toDbJson(object); // removes id from json.
     var id = await store.add(db, dbJson);
     return _fromDbJson(dbJson, id);
+  }
+
+  @override
+  Future<void> update(ObjectId id, T Function(T) update) {
+    return db.transaction((txn) async {
+      var key = _fromObjectIdToSembastKey(id);
+      var dbJson = await store.record(key).get(txn);
+      if (dbJson == null) {
+        throw Exception('No record found for id: $id');
+      }
+      var object = _fromDbJson(dbJson, key);
+      var updatedObject = update(object);
+      var updatedDbJson = _toDbJson(updatedObject);
+      await store.record(key).put(txn, updatedDbJson);
+    });
   }
 
   @override

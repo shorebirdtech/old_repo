@@ -20,6 +20,11 @@ class Message {
 
   Message._(this.id, this.message, this.time);
 
+  // copyWith should be auto-generated.
+  Message copyWith({String? message, DateTime? time}) {
+    return Message._(id, message ?? this.message, time ?? this.time);
+  }
+
   factory Message.fromJson(Map<String, dynamic> json) =>
       _$MessageFromJson(json);
   Map<String, dynamic> toJson() => _$MessageToJson(this);

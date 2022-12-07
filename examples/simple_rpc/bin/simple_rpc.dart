@@ -6,13 +6,17 @@ import 'package:simple_rpc/model.dart';
 // This should be able to make an RPC call to the server
 // With auto-generated client and transport code.
 
-void main(List<String> arguments) {
+void main(List<String> arguments) async {
   var client = Client();
 
   // Subscribe to a stream from the server for messages.
   var subscription = client.newMessages().listen((message) {
     print('Received message: ${message.message} at ${message.time}');
   });
+
+  var id = await client.sendMessage(
+      Message('Original text.', DateTime.now()), "red");
+  await client.changeMessageText(id, "New text!");
 
   // Post a message to the server every N seconds.
   Timer.periodic(

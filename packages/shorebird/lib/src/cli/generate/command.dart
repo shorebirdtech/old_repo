@@ -16,6 +16,7 @@ class GenerateCommand extends Command {
   GenerateCommand() {
     // Disable formatting during development.
     argParser.addFlag('format', defaultsTo: true);
+    argParser.addOption('output', defaultsTo: 'lib/gen');
   }
 
   @override
@@ -31,9 +32,9 @@ class GenerateCommand extends Command {
         AnalysisContextCollection(includedPaths: [Directory.current.path]);
     var result = await collectAnnotations(collection);
     print(
-        'Found ${result.endpoints.length} endpoint(s), generating handlers...');
+        'Found ${result.endpoints.length} endpoint(s) and ${result.models.length} model(s), generating code...');
 
-    final genLocation = 'lib/gen';
+    final genLocation = argResults!['output'] as String;
     print('Generating source code into $genLocation...');
     var writer = _LibraryWriter(genLocation,
         formatOutput: argResults!['format'] as bool);

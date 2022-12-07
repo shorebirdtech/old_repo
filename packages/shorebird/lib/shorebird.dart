@@ -51,6 +51,15 @@ class Client {
     return response;
   }
 
+  T extractResponse<T>(http.Response response) {
+    var json = jsonDecode(response.body);
+    // if (json['error'] != null) {
+    //   throw Exception(json['error']);
+    // }
+    print("extracting: $json");
+    return json['result'] as T;
+  }
+
   /// Watch a stream of events from the server.
   Stream<Map<String, dynamic>> watch(String path,
       [Map<String, dynamic> body = const <String, dynamic>{}]) {
