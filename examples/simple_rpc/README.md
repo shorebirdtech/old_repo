@@ -1,10 +1,16 @@
-Pure-dart example of using shorebird to create a simple post and watch RPC
+Pure-dart example of using Shorebird to create a simple post and watch RPC
 with a custom type.
 
+# Usage
+
+```bash
+shorebird run
+```
+
 # Notes
-- Works, but has lots of manual code instead of generated.
 - Client never exits (unclear why).
 - Server gets upset (SocketException: Write failed) when client re-connects.
+  I think this is due to one of the Streams not forwarding a close message.
 - Client never gets an echo for the 5th message.
 - Client does not know how to disconnect on idle or reconnect with backoff.
 - Should test multiple arguments, optional, named, etc.

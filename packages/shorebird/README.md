@@ -1,4 +1,7 @@
-Main package for Shorebird
+[![Pub package](https://img.shields.io/pub/v/shorebird.svg)](https://pub.dev/packages/shorebird)
+[![Discord](https://dcbadge.vercel.app/api/server/9hKJcWGcaB)](https://discord.gg/9hKJcWGcaB)
+
+# Shorebird
 
 This package is a work in progress.  If you're interested in using it, please
 join us on Discord: https://discord.gg/9hKJcWGcaB
