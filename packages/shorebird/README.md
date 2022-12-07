@@ -88,6 +88,7 @@ void main() {
 ## Deploy Design
 - A server somewhere that can handle vhost requests and route urls to the
   correct port. MVP: A single server which can show two different apps.
+  Pointers: Traefik, Redbird.
 - A server that can handle deploy requests and build images (docker) for an app.
   MVP: A single server that can build an app and put it somewhere.
 - How are databases set-up/deployed?
