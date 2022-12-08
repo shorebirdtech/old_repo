@@ -41,7 +41,7 @@ Method _clientMethodForEndpoint(FunctionDefinition endpoint) {
       call = call
           .property('then')
           .call([
-            refer('extractResponse<${resultType.networkTypeReference.symbol}>',
+            refer('extractResponse<${resultType.networkTypeReferenceString}>',
                 shorebirdUrl)
           ])
           .property('then')

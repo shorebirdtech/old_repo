@@ -9,13 +9,24 @@ class TypeDefinition {
 
   // Not sure if this is the correct heuristic.  It's used for deciding
   // if we need to call fromJson or just cast.
-  bool get isPrimitive => url == null || url == 'dart:core';
+  bool get isPrimitiveJsonType {
+    return name == 'int' ||
+        name == 'double' ||
+        name == 'String' ||
+        name == 'bool';
+  }
+
   bool get isVoid => dartType.isVoid;
   bool get isList => dartType.isDartCoreList;
 
   bool get hasInnerType => dartType is ParameterizedType;
 
-  bool get isIterable => dartType.isDartCoreIterable;
+  // This is used to tell if we need to use map for to/fromJson.
+  // Custom types would implement their own to/fromJson instead.
+  bool get isIterable =>
+      dartType.isDartCoreIterable ||
+      dartType.isDartCoreList ||
+      dartType.isDartCoreSet;
 
   TypeDefinition get innerType {
     if (dartType is ParameterizedType) {
@@ -38,6 +49,9 @@ class TypeDefinition {
     }
     return dartType.element?.librarySource?.uri.toString();
   }
+
+  @override
+  String toString() => 'TypeDefinition($name)';
 }
 
 class ClassDefinition {
@@ -190,6 +204,9 @@ extension TypeGeneration on TypeDefinition {
     if (name == 'ObjectId') {
       return typeReference.property('fromHexString').call([value]);
     }
+    if (name == 'DateTime') {
+      return typeReference.property('parse').call([value]);
+    }
     if (isIterable) {
       return value
           .property('map')
@@ -198,11 +215,13 @@ extension TypeGeneration on TypeDefinition {
                   ..requiredParameters.add(Parameter((p) => p.name = 'e'))
                   ..body = innerType.fromJson(refer('e')).returned.statement)
                 .closure
+          ], {}, [
+            innerTypeReference
           ])
           .property('toList')
           .call([]);
     }
-    if (isPrimitive) {
+    if (isPrimitiveJsonType) {
       // This produces many "unecessary cast" warnings.
       // return value.asA(typeReference);
       return value;
@@ -215,6 +234,9 @@ extension TypeGeneration on TypeDefinition {
     if (name == 'ObjectId') {
       return value.property('toHexString').call([]);
     }
+    if (name == 'DateTime') {
+      return value.property('toIso8601String').call([]);
+    }
     if (isIterable) {
       return value
           .property('map')
@@ -226,27 +248,61 @@ extension TypeGeneration on TypeDefinition {
           .property('toList')
           .call([]);
     }
-    if (isPrimitive) {
+    if (isPrimitiveJsonType) {
       return value;
     }
     return value.property('toJson').call([]);
   }
 
-  // Hack for ObjectId having a toJson but not returning a Map.
-  // The real solution is to have a method which returns the type
-  // returned by "toJson" or equivalent.
-  bool get isPrimitiveNetworkType {
-    return isPrimitive || name == 'ObjectId';
+  // Would like to implement this, but I don't know how to get
+  // TypeDefinitions at runtime.
+  // TypeDefinition get networkType {
+  //   if (name == 'ObjectId') {
+  //     return TypeDefinition('String');
+  //   }
+  //   if (isPrimitiveJsonType) {
+  //     return this;
+  //   }
+  //   return TypeDefinition('Map<String, dynamic>');
+  // }
+
+  bool get networkTypeIsPrimitiveJsonType {
+    if (name == 'ObjectId') {
+      return true;
+    }
+    if (name == 'DateTime') {
+      return true;
+    }
+    if (isPrimitiveJsonType) {
+      return true;
+    }
+    return false;
+  }
+
+  String get networkTypeReferenceString {
+    // Hacks until we have JsonKey support.
+    if (name == 'ObjectId') {
+      return 'String';
+    }
+    if (name == 'DateTime') {
+      return 'String';
+    }
+
+    if (isIterable) {
+      // I'm not sure why we can't give full types here.
+      // extractResult uses this type.
+      return 'List';
+      // return 'List<${innerType.networkTypeReferenceString}>';
+    }
+    if (isPrimitiveJsonType) {
+      return name;
+    }
+    // Non-core types expect toJson to return a Map<String, dynamic>.
+    return 'Map<String, dynamic>';
   }
 
   Reference get networkTypeReference {
-    if (name == 'ObjectId') {
-      return refer('String');
-    }
-    if (isPrimitive) {
-      return typeReference;
-    }
-    return refer('Map<String, dynamic>');
+    return refer(networkTypeReferenceString);
   }
 }
 

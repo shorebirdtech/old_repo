@@ -120,7 +120,10 @@ Code _handlerForEndpoint(FunctionDefinition endpoint) {
           } else {
             b.addExpression(declareFinal('result').assign(endpointCall));
             var jsonResult = endpoint.innerReturnType.toJson(refer('result'));
-            if (endpoint.innerReturnType.isPrimitiveNetworkType) {
+            // Also treat Iterable<T> as primitive to go through the
+            // Response.primitive() path instead of Response.json().
+            if (endpoint.innerReturnType.networkTypeIsPrimitiveJsonType ||
+                endpoint.innerReturnType.isIterable) {
               b.addExpression(refer('Response', shorebirdUrl)
                   .property('primitive')
                   .call([jsonResult]).returned);

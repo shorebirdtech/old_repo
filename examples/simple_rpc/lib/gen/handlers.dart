@@ -3,9 +3,11 @@ import 'dart:core';
 
 import 'package:shorebird/datastore.dart';
 import 'package:shorebird/handler.dart';
+import 'package:shorebird/shorebird.dart';
 import 'package:simple_rpc/model.dart';
 
 import '../endpoints.dart';
+import 'handlers.dart';
 
 class SendMessageArgs {
   SendMessageArgs(
@@ -31,11 +33,17 @@ class SendMessagesArgs {
   SendMessagesArgs(this.messages);
 
   SendMessagesArgs.fromJson(Map<String, dynamic> json)
-      : messages = json['messages'];
+      : messages = json['messages'].map<Message>((e) {
+          return Message.fromJson(e);
+        }).toList();
 
   final List<Message> messages;
 
-  Map<String, dynamic> toJson() => {'messages': messages};
+  Map<String, dynamic> toJson() => {
+        'messages': messages.map((e) {
+          return e.toJson();
+        }).toList()
+      };
 }
 
 class AddWithOptionalArgs {
@@ -97,11 +105,11 @@ class AllMessagesSinceArgs {
   AllMessagesSinceArgs(this.since);
 
   AllMessagesSinceArgs.fromJson(Map<String, dynamic> json)
-      : since = json['since'];
+      : since = DateTime.parse(json['since']);
 
   final DateTime since;
 
-  Map<String, dynamic> toJson() => {'since': since};
+  Map<String, dynamic> toJson() => {'since': since.toIso8601String()};
 }
 
 class ChangeMessageTextArgs {
@@ -151,7 +159,9 @@ List<Handler> allHandlers = <Handler>[
         context,
         args.messages,
       );
-      return Response.primitive(result);
+      return Response.primitive(result.map((e) {
+        return e.toHexString();
+      }).toList());
     },
   ),
   Handler.simpleCall(
@@ -210,7 +220,9 @@ List<Handler> allHandlers = <Handler>[
         context,
         args.since,
       );
-      return Response.primitive(result);
+      return Response.primitive(result.map((e) {
+        return e.toJson();
+      }).toList());
     },
   ),
   Handler.simpleCall(
