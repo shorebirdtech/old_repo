@@ -4,31 +4,37 @@ import 'types.dart';
 
 Method _clientMethodForEndpoint(FunctionDefinition endpoint) {
   // If the endpoint has args, build an Args class and serialize it.
-  var assignArgs = endpoint.serializedArgs.isEmpty
+  var args = endpoint.serializedParameters;
+  var assignArgs = args.isEmpty
       ? Code('')
       : declareFinal('body')
           .assign(endpoint.argsTypeReference
-              .call(endpoint.serializedArgs.map((arg) => refer(arg.name)))
+              .call(args.positional.map((arg) => refer(arg.name)),
+                  {for (var arg in args.named) arg.name: refer(arg.name)})
               .property('toJson')
               .call([]))
           .statement;
 
-  var fromJsonMethod = endpoint.innerReturnType.fromJsonMethod;
   // Call the right client method based on the endpoint's return type.
+  var fromJsonClosure = Method((m) => m
+        ..requiredParameters.add(Parameter((p) => p.name = 'e'))
+        ..body =
+            endpoint.innerReturnType.fromJson(refer('e')).returned.statement)
+      .closure;
   late Expression call;
   if (endpoint.returnsStream) {
     call = refer('watch')
         .call([
           literalString(endpoint.handlerPath),
-          if (endpoint.serializedArgs.isNotEmpty) refer('body'),
+          if (args.isNotEmpty) refer('body'),
         ])
         .property('map')
-        .call([fromJsonMethod]);
+        .call([fromJsonClosure]);
   } else {
     // Returns Future<T>
     call = refer('post').call([
       literalString(endpoint.handlerPath),
-      if (endpoint.serializedArgs.isNotEmpty) refer('body'),
+      if (args.isNotEmpty) refer('body'),
     ]);
     var resultType = endpoint.innerReturnType;
     if (!resultType.isVoid) {
@@ -39,17 +45,14 @@ Method _clientMethodForEndpoint(FunctionDefinition endpoint) {
                 shorebirdUrl)
           ])
           .property('then')
-          .call([fromJsonMethod]);
+          .call([fromJsonClosure]);
     }
   }
   var method = MethodBuilder();
   method.name = endpoint.name;
   method.returns = endpoint.returnTypeReference;
-  method.requiredParameters.addAll(endpoint.serializedArgs.map((arg) {
-    return Parameter((b) => b
-      ..name = arg.name
-      ..type = arg.typeReference);
-  }));
+  method.requiredParameters.addAll(args.buildRequiredParameters());
+  method.optionalParameters.addAll(args.buildOptionalParameters());
   method.body = Block.of([
     assignArgs,
     call.returned.statement,

@@ -14,15 +14,15 @@ part 'model.g.dart';
 @JsonSerializable(constructor: '_')
 class Message {
   final ObjectId id;
-  final String message;
+  final String content;
   final DateTime time;
-  Message(this.message, this.time) : id = ObjectId();
+  Message(this.content, this.time) : id = ObjectId();
 
-  Message._(this.id, this.message, this.time);
+  Message._(this.id, this.content, this.time);
 
   // copyWith should be auto-generated.
-  Message copyWith({String? message, DateTime? time}) {
-    return Message._(id, message ?? this.message, time ?? this.time);
+  Message copyWith({String? content, DateTime? time}) {
+    return Message._(id, content ?? this.content, time ?? this.time);
   }
 
   factory Message.fromJson(Map<String, dynamic> json) =>

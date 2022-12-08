@@ -8,12 +8,12 @@ part of 'model.dart';
 
 Message _$MessageFromJson(Map<String, dynamic> json) => Message._(
       const ObjectIdConverter().fromJson(json['id'] as String),
-      json['message'] as String,
+      json['content'] as String,
       DateTime.parse(json['time'] as String),
     );
 
 Map<String, dynamic> _$MessageToJson(Message instance) => <String, dynamic>{
       'id': const ObjectIdConverter().toJson(instance.id),
-      'message': instance.message,
+      'content': instance.content,
       'time': instance.time.toIso8601String(),
     };

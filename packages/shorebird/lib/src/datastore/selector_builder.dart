@@ -32,6 +32,20 @@ class SortBySelector extends Selector {
   SortBySelector(this.field, {this.descending = false});
 }
 
+class GteSelector extends Selector {
+  final String field;
+  final dynamic value;
+
+  GteSelector(this.field, this.value);
+}
+
+class LteSelector extends Selector {
+  final String field;
+  final dynamic value;
+
+  LteSelector(this.field, this.value);
+}
+
 // Modeled after mongo_dart_query which is the best query builder I've seen.
 // Suggestions welcome for something better. :)
 // https://pub.dev/documentation/mongo_dart_query/latest/mongo_dart_query/SelectorBuilder-class.html
@@ -45,6 +59,12 @@ class SelectorBuilder {
 
   SelectorBuilder eq(String field, Object value) =>
       SelectorBuilder([...selectors, EqSelector(field, value)]);
+
+  SelectorBuilder gte(String field, Object value) =>
+      SelectorBuilder([...selectors, GteSelector(field, value)]);
+
+  SelectorBuilder lte(String field, Object value) =>
+      SelectorBuilder([...selectors, LteSelector(field, value)]);
 
   SelectorBuilder limit(int limit) =>
       SelectorBuilder([...selectors, LimitSelector(limit)]);

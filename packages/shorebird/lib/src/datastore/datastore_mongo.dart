@@ -34,6 +34,10 @@ extension SelectorBuilderMongo on SelectorBuilder {
         mongoSelector.limit(selector.limit);
       } else if (selector is SortBySelector) {
         mongoSelector.sortBy(selector.field, descending: selector.descending);
+      } else if (selector is GteSelector) {
+        mongoSelector.gte(selector.field, selector.value);
+      } else if (selector is LteSelector) {
+        mongoSelector.lte(selector.field, selector.value);
       } else {
         throw UnsupportedError('Unsupported selector: $selector');
       }
@@ -108,6 +112,14 @@ class CollectionMongo<T> extends Collection<T> {
     // Insert modifies dbJson (adds _id).
     await _collection.insert(dbJson);
     return _fromDbJson(dbJson);
+  }
+
+  @override
+  Future<List<T>> createMany(List<T> objects) async {
+    var dbJsons = objects.map(_toDbJson).toList();
+    // Insert modifies dbJson (adds _id).
+    await _collection.insertAll(dbJsons);
+    return dbJsons.map(_fromDbJson).toList();
   }
 
   @override

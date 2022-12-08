@@ -3,21 +3,19 @@ import 'dart:core';
 
 import 'package:shorebird/datastore.dart';
 import 'package:shorebird/handler.dart';
-import 'package:shorebird/shorebird.dart';
 import 'package:simple_rpc/model.dart';
 
 import '../endpoints.dart';
-import 'handlers.dart';
 
-class SendmessageArgs {
-  SendmessageArgs(
+class SendMessageArgs {
+  SendMessageArgs(
     this.message,
     this.stampColor,
   );
 
-  SendmessageArgs.fromJson(Map<String, dynamic> json)
+  SendMessageArgs.fromJson(Map<String, dynamic> json)
       : message = Message.fromJson(json['message']),
-        stampColor = (json['stampColor'] as String);
+        stampColor = json['stampColor'];
 
   final Message message;
 
@@ -29,22 +27,99 @@ class SendmessageArgs {
       };
 }
 
-class ChangemessagetextArgs {
-  ChangemessagetextArgs(
+class SendMessagesArgs {
+  SendMessagesArgs(this.messages);
+
+  SendMessagesArgs.fromJson(Map<String, dynamic> json)
+      : messages = json['messages'];
+
+  final List<Message> messages;
+
+  Map<String, dynamic> toJson() => {'messages': messages};
+}
+
+class AddWithOptionalArgs {
+  AddWithOptionalArgs(
+    this.a,
+    this.b, [
+    this.c = 0,
+  ]);
+
+  AddWithOptionalArgs.fromJson(Map<String, dynamic> json)
+      : a = json['a'],
+        b = json['b'],
+        c = json['c'];
+
+  final int a;
+
+  final int b;
+
+  final int c;
+
+  Map<String, dynamic> toJson() => {
+        'a': a,
+        'b': b,
+        'c': c,
+      };
+}
+
+class ToRadixStringArgs {
+  ToRadixStringArgs(
+    this.value, {
+    this.base = 10,
+  });
+
+  ToRadixStringArgs.fromJson(Map<String, dynamic> json)
+      : value = json['value'],
+        base = json['base'];
+
+  final int value;
+
+  final int base;
+
+  Map<String, dynamic> toJson() => {
+        'value': value,
+        'base': base,
+      };
+}
+
+class GetHelloStringArgs {
+  GetHelloStringArgs({required this.name});
+
+  GetHelloStringArgs.fromJson(Map<String, dynamic> json) : name = json['name'];
+
+  final String name;
+
+  Map<String, dynamic> toJson() => {'name': name};
+}
+
+class AllMessagesSinceArgs {
+  AllMessagesSinceArgs(this.since);
+
+  AllMessagesSinceArgs.fromJson(Map<String, dynamic> json)
+      : since = json['since'];
+
+  final DateTime since;
+
+  Map<String, dynamic> toJson() => {'since': since};
+}
+
+class ChangeMessageTextArgs {
+  ChangeMessageTextArgs(
     this.messageId,
     this.messageText,
   );
 
-  ChangemessagetextArgs.fromJson(Map<String, dynamic> json)
+  ChangeMessageTextArgs.fromJson(Map<String, dynamic> json)
       : messageId = ObjectId.fromHexString(json['messageId']),
-        messageText = (json['messageText'] as String);
+        messageText = json['messageText'];
 
   final ObjectId messageId;
 
   final String messageText;
 
   Map<String, dynamic> toJson() => {
-        'messageId': messageId.toJson(),
+        'messageId': messageId.toHexString(),
         'messageText': messageText,
       };
 }
@@ -56,13 +131,86 @@ List<Handler> allHandlers = <Handler>[
       context,
       json,
     ) async {
-      final args = SendmessageArgs.fromJson(json);
+      final args = SendMessageArgs.fromJson(json);
       final result = await sendMessage(
         context,
         args.message,
         args.stampColor,
       );
-      return Response.primitive(result.toJson());
+      return Response.primitive(result.toHexString());
+    },
+  ),
+  Handler.simpleCall(
+    '/sendMessages',
+    (
+      context,
+      json,
+    ) async {
+      final args = SendMessagesArgs.fromJson(json);
+      final result = await sendMessages(
+        context,
+        args.messages,
+      );
+      return Response.primitive(result);
+    },
+  ),
+  Handler.simpleCall(
+    '/addWithOptional',
+    (
+      context,
+      json,
+    ) async {
+      final args = AddWithOptionalArgs.fromJson(json);
+      final result = await addWithOptional(
+        context,
+        args.a,
+        args.b,
+        args.c,
+      );
+      return Response.primitive(result);
+    },
+  ),
+  Handler.simpleCall(
+    '/toRadixString',
+    (
+      context,
+      json,
+    ) async {
+      final args = ToRadixStringArgs.fromJson(json);
+      final result = await toRadixString(
+        context,
+        args.value,
+        base: args.base,
+      );
+      return Response.primitive(result);
+    },
+  ),
+  Handler.simpleCall(
+    '/getHelloString',
+    (
+      context,
+      json,
+    ) async {
+      final args = GetHelloStringArgs.fromJson(json);
+      final result = await getHelloString(
+        context,
+        name: args.name,
+      );
+      return Response.primitive(result);
+    },
+  ),
+  Handler.simpleCall(
+    '/allMessagesSince',
+    (
+      context,
+      json,
+    ) async {
+      final args = AllMessagesSinceArgs.fromJson(json);
+      final result = await allMessagesSince(
+        context,
+        args.since,
+      );
+      return Response.primitive(result);
     },
   ),
   Handler.simpleCall(
@@ -71,7 +219,7 @@ List<Handler> allHandlers = <Handler>[
       context,
       json,
     ) async {
-      final args = ChangemessagetextArgs.fromJson(json);
+      final args = ChangeMessageTextArgs.fromJson(json);
       await changeMessageText(
         context,
         args.messageId,

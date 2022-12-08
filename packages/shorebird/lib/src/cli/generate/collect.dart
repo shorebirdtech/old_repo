@@ -28,13 +28,16 @@ FunctionDefinition? _checkForEndpoint(Element element, String filePath) {
     args.add(ParameterDefinition(
       name: parameter.name,
       type: TypeDefinition.fromDartType(parameter.type),
+      isNamed: parameter.isNamed,
+      isOptional: parameter.isOptional,
+      defaultValueCode: parameter.defaultValueCode,
     ));
   }
   return FunctionDefinition(
     path: filePath,
     name: element.name,
     returnType: TypeDefinition.fromDartType(element.returnType),
-    args: args,
+    parameters: args,
   );
 }
 

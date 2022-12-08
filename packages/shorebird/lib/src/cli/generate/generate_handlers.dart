@@ -2,55 +2,41 @@ import 'package:code_builder/code_builder.dart';
 
 import 'types.dart';
 
-Expression _argFromJson(ParameterDefinition arg) {
-  if (arg.type.isPrimitive) {
-    return refer('json').index(literalString(arg.name)).asA(arg.typeReference);
-  } else {
-    return arg.type.fromJsonMethod
-        .call([refer('json').index(literalString(arg.name))]);
-  }
-}
-
-Expression _argToJson(ParameterDefinition arg) {
-  if (arg.type.isPrimitive) {
-    return refer(arg.name);
-  } else {
-    return refer(arg.name).property('toJson').call([]);
-  }
-}
-
 Spec _generateArgsClass(FunctionDefinition endpoint) {
-  var args = endpoint.serializedArgs;
+  var args = endpoint.serializedParameters;
   if (args.isEmpty) {
     return Code('');
   }
   var argsClass = ClassBuilder();
   argsClass.name = endpoint.argsClassName;
-  argsClass.fields.addAll(args.map((arg) {
+  // Add all parameters as fields, making optional ones nullable if not already?
+  argsClass.fields.addAll(args.all.map((arg) {
     return Field((b) => b
       ..name = arg.name
       ..type = arg.typeReference
       ..modifier = FieldModifier.final$);
   }));
   argsClass.constructors.add(Constructor((b) => b
-    ..requiredParameters.addAll(args.map((arg) {
-      return Parameter((b) => b
-        ..name = arg.name
-        ..toThis = true);
-    }))));
+    ..requiredParameters.addAll(args.buildRequiredParameters(toThis: true))
+    ..optionalParameters.addAll(args.buildOptionalParameters(toThis: true))));
   argsClass.constructors.add(Constructor((b) => b
     ..name = 'fromJson'
     ..requiredParameters.add(Parameter((b) => b
       ..name = 'json'
       ..type = refer('Map<String, dynamic>')))
-    ..initializers.addAll(args.map((arg) {
-      return refer(arg.name).assign(_argFromJson(arg)).code;
+    ..initializers.addAll(args.all.map((arg) {
+      return refer(arg.name)
+          .assign(
+              arg.type.fromJson(refer('json').index(literalString(arg.name))))
+          .code;
     }))));
 
   argsClass.methods.add(Method((b) => b
     ..name = 'toJson'
     ..returns = refer('Map<String, dynamic>')
-    ..body = literalMap({for (var a in args) a.name: _argToJson(a)}).code));
+    ..body = literalMap({
+      for (var arg in args.all) arg.name: arg.type.toJson(refer(arg.name))
+    }).code));
   return argsClass.build();
 }
 
@@ -74,7 +60,8 @@ Code _handlerForEndpoint(FunctionDefinition endpoint) {
   // also not awaited, but are otherwise very similar
   // to simpleCall endpoints.
 
-  var argsFromJson = endpoint.serializedArgs.isEmpty
+  var args = endpoint.serializedParameters;
+  var argsFromJson = args.isEmpty
       ? Code('')
       : declareFinal('args')
           .assign(endpoint.argsTypeReference
@@ -85,10 +72,13 @@ Code _handlerForEndpoint(FunctionDefinition endpoint) {
     Parameter((p) => p.name = 'context'),
     Parameter((p) => p.name = 'json')
   ];
-  var endpointArgs = [
+  var positionalArgs = [
     refer('context'),
-    ...endpoint.serializedArgs.map((arg) => refer('args').property(arg.name)),
+    ...args.positional.map((arg) => refer('args').property(arg.name)),
   ];
+  var namedArgs = {
+    for (var arg in args.named) arg.name: refer('args').property(arg.name)
+  };
 
   if (endpoint.returnsStream) {
     return refer('Handler', handlerUrl).property('stream').call([
@@ -98,7 +88,7 @@ Code _handlerForEndpoint(FunctionDefinition endpoint) {
         f.body = Block.of([
           argsFromJson,
           endpoint.reference
-              .call(endpointArgs)
+              .call(positionalArgs, namedArgs)
               .property('asyncMap')
               .call([
                 Method((c) {
@@ -113,7 +103,8 @@ Code _handlerForEndpoint(FunctionDefinition endpoint) {
       }).closure
     ]).code;
   } else {
-    var endpointCall = endpoint.reference.call(endpointArgs).awaited;
+    var endpointCall =
+        endpoint.reference.call(positionalArgs, namedArgs).awaited;
     return refer('Handler', handlerUrl).property('simpleCall').call([
       literalString(endpoint.handlerPath),
       Method((f) {
@@ -128,7 +119,7 @@ Code _handlerForEndpoint(FunctionDefinition endpoint) {
                 .call([]).returned);
           } else {
             b.addExpression(declareFinal('result').assign(endpointCall));
-            var jsonResult = refer('result').property('toJson').call([]);
+            var jsonResult = endpoint.innerReturnType.toJson(refer('result'));
             if (endpoint.innerReturnType.isPrimitiveNetworkType) {
               b.addExpression(refer('Response', shorebirdUrl)
                   .property('primitive')

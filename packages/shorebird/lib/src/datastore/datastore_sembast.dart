@@ -24,6 +24,13 @@ extension SelectorBuilderSembast on SelectorBuilder {
     List<SortOrder> sortOrders = [];
     Filter? filter;
 
+    void setFilter(Filter newFilter) {
+      if (filter != null) {
+        throw StateError('Filter already set');
+      }
+      filter = newFilter;
+    }
+
     for (var selector in selectors) {
       if (selector is LimitSelector) {
         if (limit != null) {
@@ -33,15 +40,13 @@ extension SelectorBuilderSembast on SelectorBuilder {
       } else if (selector is SortBySelector) {
         sortOrders.add(SortOrder(selector.field, !selector.descending));
       } else if (selector is IdSelector) {
-        if (filter != null) {
-          throw StateError('Filter already set');
-        }
-        filter = Filter.byKey(_fromObjectIdToSembastKey(selector.id));
+        setFilter(Filter.byKey(_fromObjectIdToSembastKey(selector.id)));
       } else if (selector is EqSelector) {
-        if (filter != null) {
-          throw StateError('Filter already set');
-        }
-        filter = Filter.equals(selector.field, selector.value);
+        setFilter(Filter.equals(selector.field, selector.value));
+      } else if (selector is GteSelector) {
+        setFilter(Filter.greaterThanOrEquals(selector.field, selector.value));
+      } else if (selector is LteSelector) {
+        setFilter(Filter.lessThanOrEquals(selector.field, selector.value));
       } else {
         throw Exception('Unsupported selector: $selector');
       }
@@ -139,6 +144,16 @@ class CollectionSembast<T> extends Collection<T> {
     var dbJson = _toDbJson(object); // removes id from json.
     var id = await store.add(db, dbJson);
     return _fromDbJson(dbJson, id);
+  }
+
+  @override
+  Future<List<T>> createMany(List<T> objects) async {
+    var dbJsons = objects.map(_toDbJson).toList();
+    var ids = await store.addAll(db, dbJsons);
+    return List.generate(
+      ids.length,
+      (i) => _fromDbJson(dbJsons[i], ids[i]),
+    );
   }
 
   @override

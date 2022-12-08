@@ -95,6 +95,7 @@ abstract class Collection<T> {
 
   // This should be add?
   Future<T> create(T object);
+  Future<List<T>> createMany(List<T> objects);
 
   Future<void> update(ObjectId id, T Function(T? object) update);
 
