@@ -34,7 +34,7 @@ FunctionDefinition? _checkForEndpoint(Element element, String filePath) {
     ));
   }
   return FunctionDefinition(
-    path: filePath,
+    importUrl: element.location!.components.first,
     name: element.name,
     returnType: TypeDefinition.fromDartType(element.returnType),
     parameters: args,

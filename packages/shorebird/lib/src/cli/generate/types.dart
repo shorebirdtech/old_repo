@@ -1,6 +1,5 @@
 import 'package:analyzer/dart/element/type.dart';
 import 'package:code_builder/code_builder.dart';
-import 'package:path/path.dart' as p;
 
 class TypeDefinition {
   final String name;
@@ -38,6 +37,7 @@ class TypeDefinition {
   }
 
   TypeDefinition.fromDartType(this.dartType)
+      // FIXME: We're losing nullability information here.
       : name = dartType.getDisplayString(withNullability: false),
         url = urlFromDartType(dartType);
 
@@ -93,7 +93,7 @@ class ParameterList {
 /// Top-level functions used as endpoints.
 class FunctionDefinition {
   final String name;
-  final String path;
+  final String importUrl;
   final TypeDefinition returnType;
 
   /// This includes all named, optional, and required parameters.
@@ -102,7 +102,7 @@ class FunctionDefinition {
 
   FunctionDefinition({
     required this.name,
-    required this.path,
+    required this.importUrl,
     required this.returnType,
     required List<ParameterDefinition> parameters,
   }) : parameters = ParameterList(parameters);
@@ -151,16 +151,10 @@ class ReturnDefinition {
 
 // FIXME: importPrefix is wrong, we know where we're generating to and
 // we have absolute urls to where classes come from, we should just map.
-final importPrefix = '..'; // Assume imports are relative to the gen diretory.
 final handlerUrl = 'package:shorebird/handler.dart';
 final shorebirdUrl = 'package:shorebird/shorebird.dart';
 
 extension EndpointGeneration on FunctionDefinition {
-  String get url {
-    var fileName = p.basename(path);
-    return "$importPrefix/$fileName";
-  }
-
   String get argsClassName {
     var capitalized = "${name[0].toUpperCase()}${name.substring(1)}";
     return '${capitalized}Args';
@@ -184,7 +178,7 @@ extension EndpointGeneration on FunctionDefinition {
       (returnType.dartType as ParameterizedType).typeArguments.first);
 
   Reference get innerReturnTypeReference => innerReturnType.typeReference;
-  Reference get reference => refer(name, url);
+  Reference get reference => refer(name, importUrl);
   Reference get returnTypeReference => returnType.typeReference;
 }
 
