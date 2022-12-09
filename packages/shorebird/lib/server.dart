@@ -15,7 +15,9 @@ class Server {
   int get port => server.port;
   InternetAddress get address => server.address;
 
-  Future<void> serve(List<Handler> handlers, Object host, int port) async {
+  Future<void> serve(List<Handler> handlers,
+      {Object? host, int port = 3000}) async {
+    host ??= InternetAddress.anyIPv4;
     var router = shelf_router.Router();
     for (var handler in handlers) {
       router.add(handler.method, handler.path, handler.onRequest);

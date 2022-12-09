@@ -22,8 +22,10 @@ class Session {
 }
 
 // Not sure if this is the correct abstraction.
+// Should this be renamed "Connection"?
 class Client {
   final String baseUrl;
+  String? sessionId;
 
   Client({this.baseUrl = 'http://localhost:3000'});
 
@@ -38,6 +40,9 @@ class Client {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
     };
+    if (sessionId != null) {
+      headers['X-Session-Id'] = sessionId!;
+    }
     var response = await http
         .post(
           url,

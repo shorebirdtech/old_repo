@@ -5,19 +5,6 @@ import 'package:sembast/sembast_io.dart';
 
 import '../../datastore.dart';
 
-class IdSelector extends Selector {
-  final ObjectId id;
-
-  IdSelector(this.id);
-}
-
-class EqSelector extends Selector {
-  final String field;
-  final dynamic value;
-
-  EqSelector(this.field, this.value);
-}
-
 extension SelectorBuilderSembast on SelectorBuilder {
   Finder toSembast() {
     int? limit;
@@ -62,13 +49,13 @@ extension SelectorBuilderSembast on SelectorBuilder {
 
 class DataStoreLocal extends DataStore {
   late Database db;
-  final String dbPath;
+  final String path;
 
-  DataStoreLocal(super.classInfoMap, this.dbPath);
+  DataStoreLocal(super.classInfoMap, {this.path = 'local_datastore.json'});
 
   @override
   Future<void> init() async {
-    db = await databaseFactoryIo.openDatabase(dbPath);
+    db = await databaseFactoryIo.openDatabase(path);
   }
 
   @override
