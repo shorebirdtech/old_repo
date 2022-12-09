@@ -6,6 +6,7 @@ import 'package:code_builder/code_builder.dart';
 import 'package:dart_style/dart_style.dart';
 import 'package:path/path.dart' as p;
 
+import '../shared/config.dart';
 import 'collect.dart';
 import 'generate_client.dart';
 import 'generate_handlers.dart';
@@ -16,7 +17,6 @@ class GenerateCommand extends Command {
   GenerateCommand() {
     // Disable formatting during development.
     argParser.addFlag('format', defaultsTo: true);
-    argParser.addOption('output', defaultsTo: 'lib/gen');
   }
 
   @override
@@ -27,6 +27,10 @@ class GenerateCommand extends Command {
 
   @override
   Future<void> run() async {
+    if (argResults!.rest.isNotEmpty) {
+      throw UsageException('`generate` takes no arguments', usage);
+    }
+
     print('Analyzing source code...');
     var collection =
         AnalysisContextCollection(includedPaths: [Directory.current.path]);
@@ -34,7 +38,7 @@ class GenerateCommand extends Command {
     print(
         'Found ${result.endpoints.length} endpoint(s) and ${result.models.length} model(s), generating code...');
 
-    final genLocation = argResults!['output'] as String;
+    var genLocation = config.genFileDirectory;
     print('Generating source code into $genLocation...');
     var writer = _LibraryWriter(genLocation,
         formatOutput: argResults!['format'] as bool);
@@ -52,7 +56,7 @@ class _LibraryWriter {
   _LibraryWriter(String genDirPath, {this.formatOutput = true}) {
     genDir = Directory(genDirPath);
     if (!genDir.existsSync()) {
-      genDir.createSync();
+      genDir.createSync(recursive: true);
     }
     // Should this clear the gen directory?
   }

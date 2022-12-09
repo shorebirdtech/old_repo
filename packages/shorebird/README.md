@@ -86,12 +86,28 @@ void main() {
   Regardless they probably should end up in a separate (shorebird_cli?) package.
 - @Storable and @Transportable do not yet generate toJson/fromJson methods.
   Should be easy to fix, for now classes use json_serializable.
-
+- `shorebird generate` cannot yet handle nullable types in endpoint
+  parameters.  This is a bug in the code generator.
+- Don't yet have a nice way to handle error reporting from the server.
+  currently Client.post will throw an exception if the server returns
+  a non-200 response.
 
 ## Deploy Design
 - A server somewhere that can handle vhost requests and route urls to the
   correct port. MVP: A single server which can show two different apps.
   Pointers: Traefik, Redbird.
+  (Separate hosting domain.  Register on public suffix list.)
 - A server that can handle deploy requests and build images (docker) for an app.
   MVP: A single server that can build an app and put it somewhere.
 - How are databases set-up/deployed?
+
+
+## TODO / Demo
+* `shorebird create` (could be a whole app, not just counter)
+* `shorebird run`
+* `shorebird publish`
+  hosted version on the web, and download links
+  Also offer a push-to-deploy separate flow.
+
+## Later
+* `shorebird shorebirdify` add shorebird to an existing project.
