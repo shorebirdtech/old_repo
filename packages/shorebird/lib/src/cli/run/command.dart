@@ -4,7 +4,6 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:process/process.dart';
-import 'package:shorebird/server.dart';
 
 const serverPath = 'lib/gen/local_server.dart';
 const pidFilePath = '.dart_tool/shorebird/pids.json';
@@ -77,17 +76,6 @@ class PidFile {
 
   void remove(String tag) {
     pids.remove(tag);
-    save();
-  }
-
-  // This should not exist:
-  // https://github.com/dart-lang/sdk/issues/50654
-  void replacePid(String tag, int pid) {
-    var existing = pids[tag];
-    if (existing == null) {
-      throw StateError('Job "$tag" is not in pid file.');
-    }
-    pids[tag] = pid;
     save();
   }
 
@@ -192,6 +180,13 @@ class RunCommand extends Command {
   late final JobTracker _jobTracker;
 
   Future<Process> startProcess(List<String> args, String tag) async {
+    if (args.isEmpty) {
+      throw ArgumentError('args must not be empty');
+    }
+    // Work around https://github.com/dart-lang/sdk/issues/50654
+    if (args.first == 'dart') {
+      args = [Platform.executable, ...args.skip(1)];
+    }
     // Record the pid for the tag.
     var process = await processManager.start(args);
     _jobTracker.track(process, tag);
@@ -199,12 +194,6 @@ class RunCommand extends Command {
         .transform(utf8.decoder)
         .transform(LineSplitter())
         .listen((line) {
-      if (line.startsWith(hackAroundDartBug50654Prefix)) {
-        var processId =
-            int.parse(line.substring(hackAroundDartBug50654Prefix.length));
-        _jobTracker.pidFile.replacePid(tag, processId);
-        return; // Hide the line.
-      }
       print("$tag: $line");
     });
     process.stderr

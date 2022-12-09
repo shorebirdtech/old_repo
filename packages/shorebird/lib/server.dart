@@ -7,9 +7,6 @@ import 'package:shelf_router/shelf_router.dart' as shelf_router;
 
 import 'handler.dart';
 
-final hackAroundDartBug50654Prefix = 'PROCESS_ID:';
-final _hackAroundDartBug50654 = '$hackAroundDartBug50654Prefix $pid';
-
 class Server {
   late final HttpServer server;
 
@@ -19,9 +16,6 @@ class Server {
   InternetAddress get address => server.address;
 
   Future<void> serve(List<Handler> handlers, Object host, int port) async {
-    // https://github.com/dart-lang/sdk/issues/50654
-    print(_hackAroundDartBug50654);
-
     var router = shelf_router.Router();
     for (var handler in handlers) {
       router.add(handler.method, handler.path, handler.onRequest);
