@@ -101,6 +101,14 @@ void main() {
   MVP: A single server that can build an app and put it somewhere.
 - How are databases set-up/deployed?
 
+Imagined flow:
+```
+> shorebird login
+Successfully logged in as john@example.com
+> shorebird deploy
+Deploying app 'counter' to 'https://counter-a28f8eb-example.shorebird.dev'
+```
+
 
 ## TODO / Demo
 * `shorebird create` (could be a whole app, not just counter)
