@@ -1,5 +1,5 @@
 name: simple_rpc
-description: A sample command-line application.
+description: An example of using Shorebird.
 version: 1.0.0
 publish_to: "none"
 
@@ -7,14 +7,16 @@ environment:
   sdk: ">=2.18.5 <3.0.0"
 
 dependencies:
-  http: ^0.13.5
+  shorebird: ^0.0.1-dev.1
+  # Remove once `shorebird generate` can generate toJson/fromJson itself.
   json_annotation: ^4.7.0
-  shelf: ^1.4.0
-  shorebird:
-    path: ../../packages/shorebird
 
 dev_dependencies:
-  build_runner: ^2.3.2
-  json_serializable: ^6.5.4
   lints: ^2.0.0
   test: ^1.16.0
+  # Remove once `shorebird generate` can generate toJson/fromJson itself.
+  build_runner: ^2.3.2
+  json_serializable: ^6.5.4
+# dependency_overrides:
+#   shorebird:
+#     path: ../../packages/shorebird/

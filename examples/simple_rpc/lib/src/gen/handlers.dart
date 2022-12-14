@@ -3,11 +3,9 @@ import 'dart:core';
 
 import 'package:shorebird/datastore.dart';
 import 'package:shorebird/handler.dart';
-import 'package:shorebird/shorebird.dart';
 import 'package:simple_rpc/endpoints.dart';
 import 'package:simple_rpc/model.dart';
 
-import 'handlers.dart';
 
 class SendMessageArgs {
   SendMessageArgs(

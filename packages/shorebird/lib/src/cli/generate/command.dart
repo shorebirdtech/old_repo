@@ -78,5 +78,9 @@ $output""";
       output = DartFormatter().format(output);
     }
     File(path).writeAsStringSync(output);
+
+    // Is there a way to run this on the String before writing to a file?
+    // This removes extra includes that are not needed for example.
+    Process.runSync('dart', ['fix', '--apply', path]);
   }
 }
