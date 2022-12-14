@@ -1,6 +1,7 @@
 name: shorebird
 description: Dart serverless
 version: 0.0.1-dev.1
+repository: https://github.com/shorebirdtech/shorebird/tree/main/packages/shorebird
 
 environment:
   sdk: ">=2.17.6 <3.0.0"
