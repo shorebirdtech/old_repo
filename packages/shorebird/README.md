@@ -3,8 +3,8 @@
 
 # Shorebird
 
-This package is a work in progress.  If you're interested in using it, please
-join us on Discord: https://discord.gg/9hKJcWGcaB
+This package is a work in progress.  If you're interested in using Shorebird,
+please join us on Discord: https://discord.gg/9hKJcWGcaB
 
 # Installation
 
@@ -16,8 +16,14 @@ shorebird run
 
 # Usage
 
+Shorebird uses @Endpoint, @Storable and @Transportable annotations to mark
+sections of your code you intend to run on the server, store in a datastore,
+transport over the network, etc.
+
+## @Endpoint
+
 @Endpoint annotations are used to mark functions that should be exposed
-as serverless functions.  The function must return a Future or a Stream.
+as serverless functions.  The function must return a `Future<T>` or `Stream<T>`.
 `shorebird generate` will generate the necessary server and client code
 to connect to the function.
 
@@ -38,11 +44,19 @@ void main() async {
 }
 ```
 
+@Endpoint annotations can only be used on top level functions. This is part
+of the idea that Shorebird is a serverless architecture, your functions
+may end up run on differnet instances at different times and should not expect
+to keep state long term.  To keep state, use the DataStore or (soon) Session
+objects.
+
+## @Storable and @Transportable
+
 @Storable annotations are used to mark classes that can be stored in a
 datastore.
 @Transportable annotations are used to mark classes that can be sent across
 the network.  It's often the case that a class is both Storable and
-Transportable.
+Transportable.  (Currently they're treated interchangably.)
 
 ```dart
 import 'package:shorebird/annotations.dart';
@@ -77,45 +91,25 @@ void main() {
 - `shorebird run` does not (yet) call `shorebird generate` before running.
   This means that if you change Endpoints, Storable, or Transportable classes
   you need to run `shorebird generate` manually before running.
-- `shorebird run` leaks processes on Windows.  The pid of the process it starts
-  is not the same as the pid the process itself sees.  I think this happens
-  because `dart run` is a wrapper, which exits leaving the child process
-  with a differnet pid.
 - `shorebird` CLI dependencies are currently present in package:shorebird's
-  pubspec.yaml.  It's possible they can all be moved to dev_dependencies
-  Regardless they probably should end up in a separate (shorebird_cli?) package.
+  pubspec.yaml.  They will be moved to a separate package soon.
 - @Storable and @Transportable do not yet generate toJson/fromJson methods.
-  Should be easy to fix, for now classes use json_serializable.
+  Should be easy to fix, for now classes should also use json_serializable.
 - `shorebird generate` cannot yet handle nullable types in endpoint
   parameters.  This is a bug in the code generator.
 - Don't yet have a nice way to handle error reporting from the server.
   currently Client.post will throw an exception if the server returns
   a non-200 response.
-
-## Deploy Design
-- A server somewhere that can handle vhost requests and route urls to the
-  correct port. MVP: A single server which can show two different apps.
-  Pointers: Traefik, Redbird.
-  (Separate hosting domain.  Register on public suffix list.)
-- A server that can handle deploy requests and build images (docker) for an app.
-  MVP: A single server that can build an app and put it somewhere.
-- How are databases set-up/deployed?
-
-Imagined flow:
-```
-> shorebird login
-Successfully logged in as john@example.com
-> shorebird deploy
-Deploying app 'counter' to 'https://counter-a28f8eb-example.shorebird.dev'
-```
-
+- `shorebird login` is currently a stub.
+- `shorebird deploy` is not fully wired up yet.
 
 ## TODO / Demo
 * `shorebird create` (could be a whole app, not just counter)
 * `shorebird run`
-* `shorebird publish`
+* `shorebird deploy`
   hosted version on the web, and download links
   Also offer a push-to-deploy separate flow.
 
 ## Later
 * `shorebird shorebirdify` add shorebird to an existing project.
+* Remove 'json_serializable'and 'build_runner' dependencies everywhere.

@@ -6,9 +6,10 @@ import 'package:http/http.dart' as http;
 // This is a minimal (partial) implementation of:
 // https://html.spec.whatwg.org/multipage/server-sent-events.html
 
-// I looked for others, but:
+// I consider others, but:
 // https://pub.dev/packages/eventsource looks abandoned.
-// https://pub.dev/packages/sse doesn't seem designed for this?
+// https://pub.dev/packages/sse isn't designed for general usage, only to
+// to act as a fallback when WebSocket is not available.
 
 // Only implementing part of the event for now:
 // https://developer.mozilla.org/en-US/docs/Web/API/EventSource/message_event
@@ -89,6 +90,8 @@ class EventSourceEncoder extends Converter<Event, List<int>> {
 
   @override
   Sink<Event> startChunkedConversion(Sink<List<int>> sink) {
+    // Not currently doing gzip, on the assumption that whatever
+    // reverse proxy is in front of this will do it.
     // inputSink = gzip.encoder.startChunkedConversion(sink);
     var encodedSink = utf8.encoder.startChunkedConversion(sink);
     return encodedSink.map<Event>(_convertToString);

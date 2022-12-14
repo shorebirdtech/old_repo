@@ -60,6 +60,11 @@ ClassInfo<T> lookupClassInfo<T>(Map<Type, ClassInfo> classInfoMap) {
 
 const where = SelectorBuilder();
 
+/// DataStore is the interface to the database.
+/// It is currently used as a singleton, and should be initialized with a
+/// concrete implementation.
+/// LocalDataStore is used when storing locally in a file.
+/// RemoteDataStore is used when connecting to a remote database.
 abstract class DataStore {
   final Map<Type, ClassInfo> classInfoMap;
 

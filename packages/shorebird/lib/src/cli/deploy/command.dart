@@ -3,11 +3,15 @@ import 'dart:io';
 
 import 'package:archive/archive_io.dart';
 import 'package:args/command_runner.dart';
+import 'package:http/http.dart';
 
+import '../shared/config.dart';
 import 'ignore_file.dart';
 
 class DeployCommand extends Command {
-  DeployCommand();
+  DeployCommand() {
+    argParser.addOption('deploy-url', help: 'The URL of the deploy server.');
+  }
 
   @override
   final name = 'deploy';
@@ -45,16 +49,30 @@ class DeployCommand extends Command {
 
   void bundleForDeployment(String zipPath) {
     final files = _filesToDeploy();
-    for (var file in files) {
-      print(file);
-    }
     // Bundle the project into a zip file.
     var encoder = ZipFileEncoder();
     encoder.create(zipPath);
     for (var file in files) {
+      // print(file);
       encoder.addFile(File(file));
     }
     encoder.close();
+  }
+
+  Future<void> uploadToDeployServer(
+      {required String zipPath,
+      required String productName,
+      required Uri deployUrl}) async {
+    var request = MultipartRequest('POST', deployUrl);
+    var file = await MultipartFile.fromPath('file', zipPath);
+    request.files.add(file);
+    request.fields['productName'] = productName;
+    var response = await request.send();
+    if (response.statusCode == 200) {
+      print('Deploy queued successfully.');
+    } else {
+      print('Deploy failed: ${response.statusCode} ${response.reasonPhrase}');
+    }
   }
 
   @override
@@ -69,9 +87,18 @@ class DeployCommand extends Command {
     Directory(buildDir).createSync(recursive: true);
     final zipPath = '$buildDir/deploy.zip';
     print("Bundling project into $zipPath");
-    bundleForDeployment(zipPath);
+    // bundleForDeployment(zipPath);
+    final productName = 'my-product';
+    final deployServerString =
+        argResults!['deploy-url'] ?? config.deployServerUrl;
+    final deployUrl = Uri.parse(deployServerString);
     // Upload the zip to shorebird.
+    print("Uploading $zipPath to $deployUrl");
+    await uploadToDeployServer(
+        zipPath: zipPath, productName: productName, deployUrl: deployUrl);
     // Give the user a link to get status on the deployment.
     // Give the user the link to the final location of the deployment.
+    // Some sort of "wait" option which waits until the deploy is complete?
+    exit(0); // Should this return intead?
   }
 }

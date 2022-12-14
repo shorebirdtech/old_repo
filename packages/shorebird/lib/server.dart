@@ -7,6 +7,7 @@ import 'package:shelf_router/shelf_router.dart' as shelf_router;
 
 import 'handler.dart';
 
+/// Used by Shorebird codegen handle centralized server logic.
 class Server {
   late final HttpServer server;
 

@@ -23,6 +23,10 @@ class Session {
 
 // Not sure if this is the correct abstraction.
 // Should this be renamed "Connection"?
+/// Class for communicating with endpoint functions.
+/// Shorebird codegen will generate extensions for this class which include
+/// methods for each endpoint.
+/// Does not currently support session management.
 class Client {
   final String baseUrl;
   String? sessionId;
@@ -56,6 +60,7 @@ class Client {
     return response;
   }
 
+  /// Used to extract at typed result from a json response.
   T extractResponse<T>(http.Response response) {
     var json = jsonDecode(response.body);
     // if (json['error'] != null) {

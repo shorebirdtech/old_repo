@@ -149,8 +149,6 @@ class ReturnDefinition {
 
 // Generation helpers (is this a separate file?)
 
-// FIXME: importPrefix is wrong, we know where we're generating to and
-// we have absolute urls to where classes come from, we should just map.
 final handlerUrl = 'package:shorebird/handler.dart';
 final shorebirdUrl = 'package:shorebird/shorebird.dart';
 
@@ -193,7 +191,7 @@ extension TypeGeneration on TypeDefinition {
 
   Reference get innerTypeReference => innerType.typeReference;
 
-  Expression fromJson(Expression value) {
+  Expression callFromJson(Expression value) {
     // This is hard-coded until we have some sort of JsonKey support.
     if (name == 'ObjectId') {
       return typeReference.property('fromHexString').call([value]);
@@ -206,9 +204,9 @@ extension TypeGeneration on TypeDefinition {
           .property('map')
           .call([
             Method((m) => m
-                  ..requiredParameters.add(Parameter((p) => p.name = 'e'))
-                  ..body = innerType.fromJson(refer('e')).returned.statement)
-                .closure
+              ..requiredParameters.add(Parameter((p) => p.name = 'e'))
+              ..body =
+                  innerType.callFromJson(refer('e')).returned.statement).closure
           ], {}, [
             innerTypeReference
           ])
@@ -223,7 +221,7 @@ extension TypeGeneration on TypeDefinition {
     return typeReference.property('fromJson').call([value]);
   }
 
-  Expression toJson(Expression value) {
+  Expression callToJson(Expression value) {
     // This is hard-coded until we have some sort of JsonKey support.
     if (name == 'ObjectId') {
       return value.property('toHexString').call([]);
@@ -236,8 +234,9 @@ extension TypeGeneration on TypeDefinition {
           .property('map')
           .call([
             Method((m) => m
-              ..requiredParameters.add(Parameter((p) => p.name = 'e'))
-              ..body = innerType.toJson(refer('e')).returned.statement).closure
+                  ..requiredParameters.add(Parameter((p) => p.name = 'e'))
+                  ..body = innerType.callToJson(refer('e')).returned.statement)
+                .closure
           ])
           .property('toList')
           .call([]);

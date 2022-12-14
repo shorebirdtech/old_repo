@@ -26,8 +26,8 @@ Spec _generateArgsClass(FunctionDefinition endpoint) {
       ..type = refer('Map<String, dynamic>')))
     ..initializers.addAll(args.all.map((arg) {
       return refer(arg.name)
-          .assign(
-              arg.type.fromJson(refer('json').index(literalString(arg.name))))
+          .assign(arg.type
+              .callFromJson(refer('json').index(literalString(arg.name))))
           .code;
     }))));
 
@@ -35,7 +35,7 @@ Spec _generateArgsClass(FunctionDefinition endpoint) {
     ..name = 'toJson'
     ..returns = refer('Map<String, dynamic>')
     ..body = literalMap({
-      for (var arg in args.all) arg.name: arg.type.toJson(refer(arg.name))
+      for (var arg in args.all) arg.name: arg.type.callToJson(refer(arg.name))
     }).code));
   return argsClass.build();
 }
@@ -119,7 +119,8 @@ Code _handlerForEndpoint(FunctionDefinition endpoint) {
                 .call([]).returned);
           } else {
             b.addExpression(declareFinal('result').assign(endpointCall));
-            var jsonResult = endpoint.innerReturnType.toJson(refer('result'));
+            var jsonResult =
+                endpoint.innerReturnType.callToJson(refer('result'));
             // Also treat Iterable<T> as primitive to go through the
             // Response.primitive() path instead of Response.json().
             if (endpoint.innerReturnType.networkTypeIsPrimitiveJsonType ||

@@ -59,6 +59,10 @@ ClassDefinition? _checkForModel(Element element, String filePath) {
       type: TypeDefinition.fromDartType(field.type),
     ));
   }
+
+  // bool hasToJson =
+  //     element.lookUpConcreteMethod('toJson', element.library) != null;
+  // bool hasFromJson = element.getNamedConstructor('fromJson') != null;
   return ClassDefinition(
     name: element.name,
     type: TypeDefinition.fromDartType(element.thisType),
@@ -96,10 +100,12 @@ Future<CollectionResult> collectAnnotations(
       for (var element in topElements) {
         var endpoint = _checkForEndpoint(element, filePath);
         if (endpoint != null) {
+          // print("Found endpoint in $filePath: ${endpoint.name}");
           endpoints.add(endpoint);
         }
         var model = _checkForModel(element, filePath);
         if (model != null) {
+          // print("Found model in $filePath: ${model.name}");
           models.add(model);
         }
       }

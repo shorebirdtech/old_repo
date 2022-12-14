@@ -9,6 +9,28 @@ import 'types.dart';
 //     fromJson: (value) => Message.fromJson(value),
 //   ),
 // };
+// Method _generateToJson(ClassDefinition model) {
+//   return Method((m) => m
+//     ..requiredParameters.add(Parameter((p) => p.name = 'value'))
+//     ..body = literalMap({
+//       for (var f in model.fields)
+//         f.name: f.type.callToJson(refer('value').property(f.name))
+//     }).returned.statement);
+// }
+
+// This makes assumptions about the availble constructors.
+// Including not supporting named arguments (yet).
+// Method _generateFromJson(ClassDefinition model) {
+//   return Method((m) => m
+//     ..requiredParameters.add(Parameter((p) => p.name = 'value'))
+//     ..body = model.type.typeReference
+//         .call([
+//           for (var f in model.fields)
+//             f.type.callFromJson(refer('value').index(literalString(f.name)))
+//         ])
+//         .returned
+//         .statement);
+// }
 
 Library generateStorable(List<ClassDefinition> models) {
   final classInfoUrl = 'package:shorebird/datastore.dart';

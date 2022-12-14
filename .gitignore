@@ -23,5 +23,9 @@ doc/api/
 *.js.deps
 *.js.map
 
+# Manual `dart compile` calls may produce these:
+*.dill
+*.exe
+
 .flutter-plugins
 .flutter-plugins-dependencies

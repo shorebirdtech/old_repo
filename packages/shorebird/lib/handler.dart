@@ -4,6 +4,7 @@ import 'package:shorebird/src/handlers/simple_call.dart';
 
 import 'shorebird.dart';
 
+/// Used by Shorebird codgen to return a response from a handler.
 class Response {
   Map<String, dynamic> responseJson;
 
@@ -12,7 +13,7 @@ class Response {
   Response.json(Map<String, dynamic> json) : responseJson = {'result': json};
 }
 
-// Move to a code-gen internal "handlers.dart" include instead.
+/// Used by Shorebird codegen to register handlers for endpoints.
 class Handler {
   final String path;
   final shelf.Handler onRequest;

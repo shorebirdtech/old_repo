@@ -19,7 +19,7 @@ Method _clientMethodForEndpoint(FunctionDefinition endpoint) {
   var fromJsonClosure = Method((m) => m
         ..requiredParameters.add(Parameter((p) => p.name = 'e'))
         ..body =
-            endpoint.innerReturnType.fromJson(refer('e')).returned.statement)
+            endpoint.innerReturnType.callFromJson(refer('e')).returned.statement)
       .closure;
   late Expression call;
   if (endpoint.returnsStream) {

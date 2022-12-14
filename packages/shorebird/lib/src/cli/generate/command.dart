@@ -31,9 +31,10 @@ class GenerateCommand extends Command {
       throw UsageException('`generate` takes no arguments', usage);
     }
 
-    print('Analyzing source code...');
+    var libraryDirectory = Directory.current.path;
+    print('Analyzing source code in $libraryDirectory...');
     var collection =
-        AnalysisContextCollection(includedPaths: [Directory.current.path]);
+        AnalysisContextCollection(includedPaths: [libraryDirectory]);
     var result = await collectAnnotations(collection);
     print(
         'Found ${result.endpoints.length} endpoint(s) and ${result.models.length} model(s), generating code...');
