@@ -16,19 +16,20 @@ class Server {
   int get port => server.port;
   InternetAddress get address => server.address;
 
-  Future<void> serve(List<Handler> handlers,
-      {Object? host, int port = 3000}) async {
-    host ??= InternetAddress.anyIPv4;
-    var router = shelf_router.Router();
+  Future<void> serve(List<Handler> handlers) async {
+    final router = shelf_router.Router();
     for (var handler in handlers) {
       router.add(handler.method, handler.path, handler.onRequest);
     }
 
-    var handler = const shelf.Pipeline()
+    final port =
+        int.tryParse(Platform.environment['SHOREBIRD_PORT'] ?? '') ?? 3000;
+
+    final handler = const shelf.Pipeline()
         .addMiddleware(shelf.logRequests())
         .addMiddleware(corsHeaders())
         .addHandler(router);
-    server = await shelf_io.serve(handler, host, port);
+    server = await shelf_io.serve(handler, InternetAddress.anyIPv4, port);
 
     // Enable content compression
     server.autoCompress = true;
