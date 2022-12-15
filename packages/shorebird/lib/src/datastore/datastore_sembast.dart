@@ -9,14 +9,7 @@ extension SelectorBuilderSembast on SelectorBuilder {
   Finder toSembast() {
     int? limit;
     List<SortOrder> sortOrders = [];
-    Filter? filter;
-
-    void setFilter(Filter newFilter) {
-      if (filter != null) {
-        throw StateError('Filter already set');
-      }
-      filter = newFilter;
-    }
+    List<Filter> filters = [];
 
     for (var selector in selectors) {
       if (selector is LimitSelector) {
@@ -27,18 +20,26 @@ extension SelectorBuilderSembast on SelectorBuilder {
       } else if (selector is SortBySelector) {
         sortOrders.add(SortOrder(selector.field, !selector.descending));
       } else if (selector is IdSelector) {
-        setFilter(Filter.byKey(_fromObjectIdToSembastKey(selector.id)));
+        filters.add(Filter.byKey(_fromObjectIdToSembastKey(selector.id)));
       } else if (selector is EqSelector) {
-        setFilter(Filter.equals(selector.field, selector.value));
+        filters.add(Filter.equals(selector.field, selector.value));
       } else if (selector is GteSelector) {
-        setFilter(Filter.greaterThanOrEquals(selector.field, selector.value));
+        filters.add(Filter.greaterThanOrEquals(selector.field, selector.value));
       } else if (selector is LteSelector) {
-        setFilter(Filter.lessThanOrEquals(selector.field, selector.value));
+        filters.add(Filter.lessThanOrEquals(selector.field, selector.value));
       } else {
         throw Exception('Unsupported selector: $selector');
       }
     }
 
+    late Filter? filter;
+    if (filters.isEmpty) {
+      filter = null;
+    } else if (filters.length == 1) {
+      filter = filters.first;
+    } else {
+      filter = Filter.and(filters);
+    }
     return Finder(
       filter: filter,
       sortOrders: sortOrders,
