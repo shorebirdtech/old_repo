@@ -6,4 +6,5 @@ Main repository for shorebird.dev
 ## Getting Started
 See `package:shorebird` [README.md](packages/shorebird/README.md)
 
-If you're interested in using Shorebird, please join us on Discord.
+If you're interested in using Shorebird, please join us on
+[Discord](https://discord.gg/9hKJcWGcaB).
