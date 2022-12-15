@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:archive/archive_io.dart';
 import 'package:args/command_runner.dart';
 import 'package:http/http.dart';
+import 'package:path/path.dart' as p;
 
 import '../shared/config.dart';
 import 'ignore_file.dart';
@@ -53,8 +54,11 @@ class DeployCommand extends Command {
     var encoder = ZipFileEncoder();
     encoder.create(zipPath);
     for (var file in files) {
+      var relativePath = p.relative(file, from: Directory.current.path);
       // print(file);
-      encoder.addFile(File(file));
+      // By default package:archive only includes the file name, we want
+      // to use the relative path intead.
+      encoder.addFile(File(file), relativePath);
     }
     encoder.close();
   }
@@ -87,7 +91,7 @@ class DeployCommand extends Command {
     Directory(buildDir).createSync(recursive: true);
     final zipPath = '$buildDir/deploy.zip';
     print("Bundling project into $zipPath");
-    // bundleForDeployment(zipPath);
+    bundleForDeployment(zipPath);
     final productName = 'my-product';
     final deployServerString =
         argResults!['deploy-url'] ?? config.deployServerUrl;
