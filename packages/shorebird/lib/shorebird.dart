@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:shorebird/src/eventsource.dart';
 
 /// Passed to Endpoint functions to allow them to access server resources.
+/// This is not currently implemented to do anything.
 class RequestContext {}
 
 /// Passed to the Endpoint when client has authenticated allowing access to
@@ -13,6 +14,7 @@ class RequestContext {}
 typedef AuthenticatedContext = RequestContext;
 
 // devs will want to store arbitrary data on the session?
+/// Shorebird does not yet have any session management, this is a placeholder.
 class Session {
   factory Session.of(RequestContext context) {
     return Session();
@@ -31,6 +33,7 @@ class Client {
   final String baseUrl;
   String? sessionId;
 
+  /// Create a client for communicating with Shorebird cloud.
   Client({this.baseUrl = 'http://localhost:3000'});
 
   /// Post a request to the server.

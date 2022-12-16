@@ -24,6 +24,8 @@ class Handler {
     this.method = 'POST',
   });
 
+  /// Creates a handler that can be used to handle a request to a
+  /// [Future<T>] [Endpoint].
   factory Handler.simpleCall(
       String path,
       Future<Response> Function(
@@ -35,6 +37,8 @@ class Handler {
     );
   }
 
+  /// Creates a handler that can be used to handle a request to a
+  /// [Stream<T>] [Endpoint]
   factory Handler.stream(
       String path,
       Stream<Map<String, dynamic>> Function(

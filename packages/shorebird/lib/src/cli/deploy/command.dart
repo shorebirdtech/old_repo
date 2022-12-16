@@ -92,6 +92,8 @@ class DeployCommand extends Command {
     final zipPath = '$buildDir/deploy.zip';
     print("Bundling project into $zipPath");
     bundleForDeployment(zipPath);
+    // Should check the size of the zip file and warn if it's too big?
+
     final productName = 'my-product';
     final deployServerString =
         argResults!['deploy-url'] ?? config.deployServerUrl;

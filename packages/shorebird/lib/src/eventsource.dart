@@ -3,16 +3,13 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
-// This is a minimal (partial) implementation of:
-// https://html.spec.whatwg.org/multipage/server-sent-events.html
-
 // I consider others, but:
 // https://pub.dev/packages/eventsource looks abandoned.
 // https://pub.dev/packages/sse isn't designed for general usage, only to
 // to act as a fallback when WebSocket is not available.
 
-// Only implementing part of the event for now:
-// https://developer.mozilla.org/en-US/docs/Web/API/EventSource/message_event
+/// Only implements the data: field for now.
+/// https://developer.mozilla.org/en-US/docs/Web/API/EventSource/message_event
 class Event {
   final String data;
 
@@ -21,6 +18,9 @@ class Event {
 
 // It's not clear why this is a class and not just a free function.
 // I guess you might want it a class to handle reconnects?
+/// This is a minimal implementation of the EventSource protocol.
+/// https://html.spec.whatwg.org/multipage/server-sent-events.html
+/// It currently only uses the data: field.
 class EventSource {
   final Uri uri;
   late http.Client _client;
@@ -79,6 +79,8 @@ String _convertToString(Event event) {
   return payload;
 }
 
+/// A simple Converter that converts an Event to a List<int> of bytes.
+/// used as part of implementing the EventSource protocol.
 class EventSourceEncoder extends Converter<Event, List<int>> {
   @override
   List<int> convert(Event input) {

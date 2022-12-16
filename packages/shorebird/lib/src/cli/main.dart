@@ -1,11 +1,12 @@
 import 'package:args/command_runner.dart';
 
+import 'deploy/command.dart';
 import 'generate/command.dart';
+import 'login/command.dart';
 import 'run/command.dart';
 import 'serve/command.dart';
-import 'deploy/command.dart';
-import 'login/command.dart';
 
+/// Main entrypoint into `shorebird` command line interface.
 void main(List<String> args) async {
   final commands = [
     GenerateCommand(),

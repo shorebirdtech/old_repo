@@ -110,6 +110,39 @@ void main() {
   hosted version on the web, and download links
   Also offer a push-to-deploy separate flow.
 
+## Questions
+* Does `shorebird deploy` also deploy a database?  Yes it should.
+* Does `shorebird deploy` always deploy a *new* database?  No, it should
+  by default connect to the existing database?
+* Does `shorebird deploy` support channels/flavors/stages?  It must.
+
 ## Later
 * `shorebird shorebirdify` add shorebird to an existing project.
 * Remove 'json_serializable'and 'build_runner' dependencies everywhere.
+* Generate should generate an OpenAPI definition for the endpoints.
+  This would make it easy to upload to a front end, like AWS API Gateway.
+
+## A note on version-skew boundary.
+Commonly applications have the Client/Server boundary also act as the version
+boundary.  This is somewhat unnatural for mobile applications, which typically
+start from the client and grow "backwards", rather than web applications which
+start from being served (an always fresh version) and grow towards the "client"
+from the "server".  Mobile applications are installed and
+updates are sometimes infrequent.  It's common to need to support *many*
+versions of the app in the wild for a very long time.  Doing this with a single
+server API can be quite difficult and constraining.
+
+Shorebird is considering an approach, where the Client
+and Server are version locked, and version skews happen within the Server. With
+modern server architecture, it's very easy to imagine handling versioned servers
+with dynamically sized instances depending on demand.
+
+It's unclear where Shorebird should put the version skew boundary.  Should it
+happen between the Server and the DataStore, or
+if there is another layer?  One possibility is that the DataStore is versioned
+too, and data migration between DataStore versions is explicit (e.g. a naive
+deploy with a changed DataStore would start from empty).  A downside
+of that approach would be that it would be hard to query across versions.
+Another approach would be to have the version skew between the DataStore and
+the Endpoints by having some stable API the DataStore exposes to the endpoints
+but the DataStore itself handles the version skew.

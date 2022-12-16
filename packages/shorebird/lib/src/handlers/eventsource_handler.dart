@@ -5,6 +5,14 @@ import 'package:shorebird/shorebird.dart';
 
 import '../eventsource.dart';
 
+/// Creates a handler that can be used to handle a request to a
+/// [Stream<T>] [Endpoint]
+/// The [createJsonStream] function is called to create the stream.
+/// The [RequestContext] is passed to the function so that it can be used
+/// to look up the current session, etc.
+/// This intentionally uses EventSource (e.g. Server-Sent Events) instead of
+/// WebSockets because it is simpler and more widely supported at the
+/// network layer.
 shelf.Handler eventSourceHandler({
   required Stream<Map<String, dynamic>> Function(
           RequestContext context, Map<String, dynamic> body)

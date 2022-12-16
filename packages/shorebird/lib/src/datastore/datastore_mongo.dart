@@ -4,6 +4,10 @@ import 'package:mongo_dart/mongo_dart.dart' as mongo;
 
 import '../../datastore.dart';
 
+/// Class to encapsulate logic used for converting between monogodb's json
+/// format and the format used by Shorebird over the network.
+/// Mongo's format uses _id for the primary key, which is an ObjectId,
+/// where as the network format uses id, which is a string.
 class MongoJsonConverter {
   static Map<String, dynamic> toDbJson(Map<String, dynamic> json) {
     var id = json['id'];
@@ -22,6 +26,8 @@ class MongoJsonConverter {
   }
 }
 
+/// An extension on SelectorBuilder used to convert from a generic
+/// SelectorBuilder to a MongoDb specific SelectorBuilder.
 extension SelectorBuilderMongo on SelectorBuilder {
   mongo.SelectorBuilder toMongo() {
     var mongoSelector = mongo.SelectorBuilder();
@@ -46,6 +52,7 @@ extension SelectorBuilderMongo on SelectorBuilder {
   }
 }
 
+/// An implementation of DataStore that uses MongoDb.
 class DataStoreRemote extends DataStore {
   late mongo.Db db;
 
@@ -70,6 +77,7 @@ class DataStoreRemote extends DataStore {
   Collection<T> collection<T>() => CollectionMongo<T>(db, classInfo<T>());
 }
 
+/// Part of DataStoreRemote's implementation of DataStore.
 class CollectionMongo<T> extends Collection<T> {
   final mongo.DbCollection _collection;
   CollectionMongo(mongo.Db db, super.classInfo)

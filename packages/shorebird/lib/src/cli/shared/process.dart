@@ -4,7 +4,7 @@ import 'dart:io';
 
 import 'package:process/process.dart';
 
-const pidFilePath = '.dart_tool/shorebird/pids.json';
+import 'config.dart';
 
 // int? pidHoldingPortWindows(int port) {
 //   var result = Process.runSync('netstat', ['-ano', '-p', 'tcp']);
@@ -41,6 +41,9 @@ const pidFilePath = '.dart_tool/shorebird/pids.json';
 //   return null;
 // }
 
+/// Used to track the pids of running jobs.
+/// Written to disk as a json file at the given path.
+/// This is used to ensure we don't leak processes (particularly on Windows).
 class PidFile {
   Map<String, int> pids;
   PidFile.emtpy() : pids = {};
@@ -48,6 +51,7 @@ class PidFile {
 
   List<String> get tags => pids.keys.toList();
 
+  /// Loads the pid file from disk.
   static Future<PidFile> load([String path = pidFilePath]) async {
     var file = File(path);
     if (!file.existsSync()) {
@@ -130,6 +134,7 @@ class _JobExit {
 
 // This should just sign up for all exit codes and call some "exited"
 // callback which then the caller can turn around into a killAll command?
+/// Wrapper around a [ProcessManager] which tracks the pids of running jobs.
 class JobRunner {
   final ProcessManager processManager;
   final PidFile pidFile;
@@ -138,6 +143,7 @@ class JobRunner {
   JobRunner(this.processManager, this.pidFile);
   JobRunner.local(this.pidFile) : processManager = const LocalProcessManager();
 
+  /// Tracks the given process under the given tag.
   void track(Process process, String tag) {
     var existing = _jobs[tag];
     if (existing != null) {
@@ -147,11 +153,13 @@ class JobRunner {
     pidFile.add(tag, process.pid);
   }
 
+  /// Kills all running jobs.
   void killAll() {
     pidFile.killAll();
     _jobs.clear();
   }
 
+  /// Wait until any tracked job exits, then kill all other jobs.
   Future<void> waitAnyExit() async {
     var completer = Completer<_JobExit>.sync();
     void onValue(value) {
@@ -175,6 +183,7 @@ class JobRunner {
     exit(jobExit.exitCode);
   }
 
+  /// Starts the given process and tracks it under the given tag.
   Future<Process> start(List<String> args, String tag) async {
     if (args.isEmpty) {
       throw ArgumentError('args must not be empty');
@@ -201,6 +210,7 @@ class JobRunner {
     return process;
   }
 
+  /// Run the given command (is not tracked in the pid file).
   Future<ProcessResult> run(List<String> command) =>
       processManager.run(command);
 }

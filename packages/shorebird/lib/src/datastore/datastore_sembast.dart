@@ -5,6 +5,8 @@ import 'package:sembast/sembast_io.dart';
 
 import '../../datastore.dart';
 
+/// An extension on SelectorBuilder used to convert from a generic
+/// SelectorBuilder to a Sembast specific Finder.
 extension SelectorBuilderSembast on SelectorBuilder {
   Finder toSembast() {
     int? limit;
@@ -48,6 +50,10 @@ extension SelectorBuilderSembast on SelectorBuilder {
   }
 }
 
+/// An implementation of DataStore that uses Sembast as a local database.
+/// Sembast is simple, but production ready for small/simple workloads.
+/// This flavor of the Datastore can also be used on-device or in the browser.
+/// See https://pub.dev/packages/sembast
 class DataStoreLocal extends DataStore {
   late Database db;
   final String path;
@@ -68,6 +74,10 @@ class DataStoreLocal extends DataStore {
   Collection<T> collection<T>() => CollectionSembast<T>(db, classInfo<T>());
 }
 
+/// A typedef for the key type used by Sembast.
+/// Currently we're using the int type instead of String to make it possible
+/// to convert to and from ObjectId keys.  ObjectId keys are used by mongo
+/// and the Shorebird API.
 typedef SembastKey = int;
 
 ObjectId _fromSembastKeyToObjectId(SembastKey key) {
@@ -79,6 +89,7 @@ SembastKey _fromObjectIdToSembastKey(ObjectId id) {
   return int.parse(id.toHexString(), radix: 16);
 }
 
+/// A collection that uses Sembast as a local database.
 class CollectionSembast<T> extends Collection<T> {
   Database db;
   // Use int keys with sembast to ensure they are smaller than ObjectId keys

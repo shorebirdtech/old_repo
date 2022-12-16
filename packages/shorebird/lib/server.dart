@@ -13,9 +13,16 @@ class Server {
 
   // FIXME: These are kinda hacky, they can't be called until serve is
   // called and only if serve was awaited.
+
+  /// The port the server is listening on.
+  /// It is only valid to call this after calling [serve].
   int get port => server.port;
+
+  /// The address the server is listening on.
+  /// It is only valid to call this after calling [serve].
   InternetAddress get address => server.address;
 
+  /// Starts the server.
   Future<void> serve(List<Handler> handlers) async {
     final router = shelf_router.Router();
     for (var handler in handlers) {

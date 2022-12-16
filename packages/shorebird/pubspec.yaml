@@ -1,5 +1,5 @@
 name: shorebird
-description: Dart serverless
+description: Provides zero-configuration serverless Dart in the cloud.
 version: 0.0.1-dev.1
 repository: https://github.com/shorebirdtech/shorebird/tree/main/packages/shorebird
 

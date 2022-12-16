@@ -4,6 +4,8 @@ import 'package:shelf/shelf.dart' as shelf;
 import 'package:shorebird/handler.dart';
 import 'package:shorebird/shorebird.dart';
 
+/// Creates a handler that can be used to handle a request to a
+/// [Future<T>] [Endpoint].
 shelf.Handler simpleCall(
     Future<Response> Function(RequestContext context, Map<String, dynamic> body)
         fn) {
