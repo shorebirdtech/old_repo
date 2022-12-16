@@ -1,3 +1,7 @@
+/// The main include file for shorebird.
+/// The client side of your application should import this file.
+/// Shorebird codegen will generate extensions for [Client] which include
+/// methods for each endpoint.
 import 'dart:async';
 import 'dart:convert';
 

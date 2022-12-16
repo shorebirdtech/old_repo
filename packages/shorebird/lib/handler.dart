@@ -1,3 +1,5 @@
+/// This file is used by Shorebird codegen to generate code used to
+/// plumb requests from the network to the [Endpoint]s.
 import 'package:shelf/shelf.dart' as shelf;
 import 'package:shorebird/src/handlers/eventsource_handler.dart';
 import 'package:shorebird/src/handlers/simple_call.dart';

@@ -1,3 +1,6 @@
+/// This file contains the abstract interfaces for the datastore.
+/// Libraries defining [Endpoint]s likely wish to include this library
+/// to acccess the [DataStore] interface.
 import 'package:json_annotation/json_annotation.dart';
 import 'package:shorebird/annotations.dart';
 import 'package:shorebird/datastore.dart';
