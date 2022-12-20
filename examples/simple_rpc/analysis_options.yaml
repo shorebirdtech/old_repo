@@ -18,6 +18,7 @@ include: package:lints/recommended.yaml
 linter:
   rules:
     - unawaited_futures
+    - avoid_void_async
 # analyzer:
 #   exclude:
 #     - path/to/excluded/files/**
