@@ -45,7 +45,11 @@ shelf.Middleware exceptionHandler() {
           body: {'message': error.message},
           headers: {HttpHeaders.contentTypeHeader: 'application/json'},
         );
-      });
+      },
+              // test is important to avoid catching HijackExceptions
+              // which are used by Shelf for control flow.
+              test: (error) =>
+                  error is Exception && error is! shelf.HijackException);
     };
   };
 }
@@ -75,6 +79,8 @@ class Server {
     final port =
         int.tryParse(Platform.environment['SHOREBIRD_PORT'] ?? '') ?? 3000;
 
+    // I'm not sure if the exceptionHandler is working? the
+    // logRequests might be swallowing the errors instead?
     final handler = const shelf.Pipeline()
         .addMiddleware(shelf.logRequests())
         .addMiddleware(corsHeaders())

@@ -87,6 +87,19 @@ void main() {
 }
 ```
 
+# Deploying into the cloud
+- `shorebird deploy` works, but requires an API key to use.  If you're
+  interested in testing Shorebird, please join us on Discord and ask for
+  an API key.
+- `shorebird deploy` currently only uses the local database on the instance
+  which lost on every deploy.  This is a bug.
+- `shorebird deploy` currently does not show any status or progress.  Deploys
+  take about 5 minutes to "complete" and then another 5 minutes to fully
+  start the instance in the cloud.  This is again a bug.\
+- `shorebird deploy` currently only supports a single instance per apiKey
+  (for simplicity), this means every time to you deploy you replace the
+  current instance.  This will change in the future.
+
 # Known issues
 - `shorebird run` does not (yet) call `shorebird generate` before running.
   This means that if you change Endpoints, Storable, or Transportable classes
@@ -100,8 +113,6 @@ void main() {
 - Don't yet have a nice way to handle error reporting from the server.
   currently Client.post will throw an exception if the server returns
   a non-200 response.
-- `shorebird login` is currently a stub.
-- `shorebird deploy` is not fully wired up yet.
 
 ## TODO / Demo
 * `shorebird create` (could be a whole app, not just counter)

@@ -8,7 +8,7 @@ shorebird run
 ```
 
 # Notes
-- Client never exits (unclear why).
+- Client never exits until the socket times out (unclear why).
 - Server gets upset (SocketException: Write failed) when client re-connects.
   I think this is due to one of the Streams not forwarding a close message.
 - Client never gets an echo for the 5th message.
