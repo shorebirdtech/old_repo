@@ -66,10 +66,7 @@ Future<List<Message>> allMessagesSince(
 Future<void> changeMessageText(
     RequestContext context, ObjectId messageId, String messageText) async {
   return DataStore.of(context).collection<Message>().update(messageId,
-      (message) {
-    if (message == null) {
-      throw ArgumentError('No message with id $messageId');
-    }
+      (Message message) {
     return message.copyWith(content: messageText);
   });
 }
