@@ -38,7 +38,11 @@ class Client {
   String? sessionId;
 
   /// Create a client for communicating with Shorebird cloud.
-  Client({this.baseUrl = 'http://localhost:3000'});
+  Client({String? baseUrl}) : baseUrl = baseUrl ?? 'http://localhost:3000/' {
+    if (!this.baseUrl.endsWith('/')) {
+      throw ArgumentError.value(this.baseUrl, 'baseUrl', 'Must end with /');
+    }
+  }
 
   /// Post a request to the server.
   Future<http.Response> post(String path,
@@ -46,7 +50,9 @@ class Client {
     if (!path.startsWith('/')) {
       throw ArgumentError.value(path, 'path', 'Must start with /');
     }
-    var url = Uri.parse('$baseUrl$path').normalizePath();
+    final baseUrlWithoutTrailingSlash =
+        baseUrl.substring(0, baseUrl.length - 1);
+    var url = Uri.parse('$baseUrlWithoutTrailingSlash$path').normalizePath();
     var headers = {
       'Content-Type': 'application/json',
       'Accept': 'application/json',

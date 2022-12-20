@@ -1,6 +1,9 @@
 This is not necessarily kept updated, just included because pub.dev
 requires it.
 
+## 0.0.1-dev.3 - 2022-12-??
+- Client baseUrl now requires a trailing slash.
+
 ## 0.0.1-dev.2 - 2022-12-16
 
 - Fixed Collection<T>.update to be non-nullable.

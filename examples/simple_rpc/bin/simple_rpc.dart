@@ -3,11 +3,16 @@ import 'dart:async';
 import 'package:simple_rpc/model.dart';
 import 'package:simple_rpc/src/gen/client.dart';
 
-// This should be able to make an RPC call to the server
-// With auto-generated client and transport code.
-
+/// This example demonstrates making RPC calls to a server via Shorebird.
+/// Client is a generated class that implements the RPC interface.
+/// All methods on Client are async as they make HTTP calls.
+///
+/// See lib/src/gen for the generated code.
+/// See lib/endpoints.dart for the endpoint definitions.
+/// See lib/model.dart for the data model.
 void main(List<String> arguments) async {
-  var client = Client();
+  var baseUrl = arguments.isNotEmpty ? arguments[0] : 'http://localhost:3000/';
+  var client = Client(baseUrl: baseUrl);
 
   // Subscribe to a stream from the server for messages.
   var subscription = client.newMessages().listen((message) {
@@ -55,5 +60,6 @@ void main(List<String> arguments) async {
       }
     },
   );
-  // Does not ever exit, not sure why?
+  // Does not ever exit, not sure why?  (This is a bug.)
+  // Eventually there is an error on the listen stream and the client exits.
 }
