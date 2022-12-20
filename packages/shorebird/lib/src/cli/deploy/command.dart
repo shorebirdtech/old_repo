@@ -6,6 +6,7 @@ import 'package:args/command_runner.dart';
 import 'package:http/http.dart';
 import 'package:path/path.dart' as p;
 
+import '../shared/auth.dart';
 import '../shared/config.dart';
 import 'ignore_file.dart';
 
@@ -27,9 +28,14 @@ class DeployCommand extends Command {
     }
   }
 
-  void _checkIfLoggedIn() {
-    // This should check for some sort of global shorebird session?
-    // Or maybe just .dart_tool/shorebird/session.json?
+  Session _getLoginSession() {
+    var info = Session.load();
+    if (info == null) {
+      throw UsageException(
+          'You must be logged in to deploy.  Try `shorebird login` first.',
+          usage);
+    }
+    return info;
   }
 
   List<String> _filesToDeploy() {
@@ -63,14 +69,21 @@ class DeployCommand extends Command {
     encoder.close();
   }
 
-  Future<void> uploadToDeployServer(
-      {required String zipPath,
-      required String productName,
-      required Uri deployUrl}) async {
+  Future<void> uploadToDeployServer({
+    required Session session,
+    required String zipPath,
+    required Uri deployUrl,
+  }) async {
+    // This should be a class which Shorebird knows how to serialize
+    // and deserialize across a multipart-form request.
     var request = MultipartRequest('POST', deployUrl);
     var file = await MultipartFile.fromPath('file', zipPath);
     request.files.add(file);
-    request.fields['productName'] = productName;
+    // The API key should probably be in a header instead?
+    // Or a session key?
+    request.fields['productName'] = session.projectId;
+    request.headers['x-api-key'] = session.apiKey;
+    request.headers['x-project-id'] = session.projectId;
     var response = await request.send();
     if (response.statusCode == 200) {
       print('Deploy queued successfully.');
@@ -84,7 +97,7 @@ class DeployCommand extends Command {
     // Check that we're inside a project directory.
     _checkInProjectDirectory();
     // Check if the user is logged in.
-    _checkIfLoggedIn();
+    var session = _getLoginSession();
     // Bundle up the project into a zip.
     // Create a new deployment on shorebird.
     final buildDir = 'build/deploy';
@@ -94,14 +107,18 @@ class DeployCommand extends Command {
     bundleForDeployment(zipPath);
     // Should check the size of the zip file and warn if it's too big?
 
-    final productName = 'my-product';
     final deployServerString =
         argResults!['deploy-url'] ?? config.deployServerUrl;
     final deployUrl = Uri.parse(deployServerString);
     // Upload the zip to shorebird.
     print("Uploading $zipPath to $deployUrl");
     await uploadToDeployServer(
-        zipPath: zipPath, productName: productName, deployUrl: deployUrl);
+      // We don't support multiple products or deploy-tags yet, just using the
+      // project ID associated with the session.
+      session: session,
+      zipPath: zipPath,
+      deployUrl: deployUrl,
+    );
     // Give the user a link to get status on the deployment.
     // Give the user the link to the final location of the deployment.
     // Some sort of "wait" option which waits until the deploy is complete?

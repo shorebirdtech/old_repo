@@ -17,6 +17,10 @@ dev_dependencies:
   # Remove once `shorebird generate` can generate toJson/fromJson itself.
   build_runner: ^2.3.2
   json_serializable: ^6.5.4
+# If you're testing changes to deploy, leave this commented out and just
+# run the edited shorbird command directly (rather than `dart run shorebird`).
+# If you're *just* testing changes to shorebird (not deploy), you can add this
+# in to have `dart run shorebird` use your edited shorbird.
 # dependency_overrides:
 #   shorebird:
 #     path: ../../packages/shorebird/

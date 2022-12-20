@@ -127,22 +127,22 @@ Commonly applications have the Client/Server boundary also act as the version
 boundary.  This is somewhat unnatural for mobile applications, which typically
 start from the client and grow "backwards", rather than web applications which
 start from being served (an always fresh version) and grow towards the "client"
-from the "server".  Mobile applications are installed and
-updates are sometimes infrequent.  It's common to need to support *many*
-versions of the app in the wild for a very long time.  Doing this with a single
-server API can be quite difficult and constraining.
+from the "server".  Mobile applications are installed and updates often
+infrequent.  It's common to need to support *many* versions of the app in the
+wild for a very long time.  Doing this with a single server API can be quite
+difficult and constraining.
 
-Shorebird is considering an approach, where the Client
-and Server are version locked, and version skews happen within the Server. With
-modern server architecture, it's very easy to imagine handling versioned servers
-with dynamically sized instances depending on demand.
+Shorebird is considering an approach, where the Client and Server are version
+locked, and version skews happen within the Server. With modern cloud, it's easy
+to imagine handling versioned servers with dynamically sized clusters depending
+on usage.
 
 It's unclear where Shorebird should put the version skew boundary.  Should it
-happen between the Server and the DataStore, or
-if there is another layer?  One possibility is that the DataStore is versioned
-too, and data migration between DataStore versions is explicit (e.g. a naive
-deploy with a changed DataStore would start from empty).  A downside
-of that approach would be that it would be hard to query across versions.
-Another approach would be to have the version skew between the DataStore and
-the Endpoints by having some stable API the DataStore exposes to the endpoints
-but the DataStore itself handles the version skew.
+happen between the Server and the DataStore, or if there is another layer?  One
+possibility is that the DataStore is versioned too, and data migration between
+DataStore versions is explicit (e.g. a naive deploy with a changed DataStore
+would start from empty).  A downside of that approach would be that it would be
+hard to query across versions. Another approach would be to have the version
+skew between the DataStore and the Endpoints by having some stable API the
+DataStore exposes to the endpoints but the DataStore itself handles the version
+skew.
