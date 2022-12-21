@@ -88,7 +88,7 @@ void main() {
 ```
 
 # Deploying into the cloud
-- `shorebird deploy` works, but requires an API key to use.  If you're
+- `shorebird deploy` works but requires an API key to use.  If you're
   interested in testing Shorebird, please join us on Discord and ask for
   an API key.
 - `shorebird deploy` currently only uses the local database on the instance
@@ -111,7 +111,7 @@ void main() {
   a non-200 response.  Instead we should have structured error reporting between
   client and server (including possibly stack traces in dev mode?).
 
-# Missing support in Endpoint / Transportable / Storable generation
+## Missing support in Endpoint / Transportable / Storable generation
 - Endpoints can't take Nullable parameters yet.
 - @Storable and @Transportable do not yet generate toJson/fromJson methods.
   Should be easy to fix, for now classes should also use json_serializable.
@@ -119,7 +119,9 @@ void main() {
   maybe https://pub.dev/packages/cross_file? or RandomAccessFile?
 
 
-## TODO / Demo
+# Notes
+
+## TODO for a Demo
 * `shorebird create` (could be a whole app, not just counter)
 * `shorebird run`
 * `shorebird deploy`

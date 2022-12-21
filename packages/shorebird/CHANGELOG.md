@@ -1,8 +1,9 @@
 This is not necessarily kept updated, just included because pub.dev
 requires it.
 
-## 0.0.1-dev.3 - 2022-12-??
+## 0.0.1-dev.3 - 2022-12-21
 - Client baseUrl now requires a trailing slash.
+- DataStore.update callback now is non-nullable.
 
 ## 0.0.1-dev.2 - 2022-12-16
 
