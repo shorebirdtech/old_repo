@@ -77,3 +77,26 @@ Stream<Message> newMessages(AuthenticatedContext context) {
   // Return a stream of messages from the datastore.
   return DataStore.of(context).collection<Message>().watchAdditions();
 }
+
+// Not sure how I should represent "File" types in Endpoint parameters.
+// dart:io and dart:html have different "File" types.
+// One option is for Shorebird to offer a "File" type that is a wrapper around
+// the dart:io and dart:html types.
+// Another option is List<int>, Stream<int> or a dart:typed_data type.
+// Finally I could just add Stream<int> support to Endpoint parameters and get
+// "File" support "for free".
+/// Example uploading a file.
+// @Endpoint()
+// Future<String> uploadAndReadContents(
+//     RequestContext context, String fileTag, File file) async {
+//   return file.readAsString();
+// }
+
+// @Endpoint()
+// Stream<String> uploadAndReadLines(
+//     RequestContext context, String fileTag, File file) async* {
+//   var lines = file.openRead().transform(utf8.decoder).transform(LineSplitter());
+//   await for (var line in lines) {
+//     yield line;
+//   }
+// }
