@@ -106,13 +106,18 @@ void main() {
   you need to run `shorebird generate` manually before running.
 - `shorebird` CLI dependencies are currently present in package:shorebird's
   pubspec.yaml.  They will be moved to a separate package soon.
-- @Storable and @Transportable do not yet generate toJson/fromJson methods.
-  Should be easy to fix, for now classes should also use json_serializable.
-- `shorebird generate` cannot yet handle nullable types in endpoint
-  parameters.  This is a bug in the code generator.
 - Don't yet have a nice way to handle error reporting from the server.
   currently Client.post will throw an exception if the server returns
-  a non-200 response.
+  a non-200 response.  Instead we should have structured error reporting between
+  client and server (including possibly stack traces in dev mode?).
+
+# Missing support in Endpoint / Transportable / Storable generation
+- Endpoints can't take Nullable parameters yet.
+- @Storable and @Transportable do not yet generate toJson/fromJson methods.
+  Should be easy to fix, for now classes should also use json_serializable.
+- No way to generate an Endpoint that takes a File upload.
+  maybe https://pub.dev/packages/cross_file? or RandomAccessFile?
+
 
 ## TODO / Demo
 * `shorebird create` (could be a whole app, not just counter)
