@@ -85,6 +85,8 @@ Stream<Message> newMessages(AuthenticatedContext context) {
 // Another option is List<int>, Stream<int> or a dart:typed_data type.
 // Finally I could just add Stream<int> support to Endpoint parameters and get
 // "File" support "for free".
+// Maybe a package:blob or VMO type that shorebird provides?
+
 /// Example uploading a file.
 // @Endpoint()
 // Future<String> uploadAndReadContents(

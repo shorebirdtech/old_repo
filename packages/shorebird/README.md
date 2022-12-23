@@ -22,7 +22,7 @@ transport over the network, etc.
 
 ## @Endpoint
 
-@Endpoint annotations are used to mark functions that should be exposed
+@Endpoint annotations are used to mark functions that should be exposed 
 as serverless functions.  The function must return a `Future<T>` or `Stream<T>`.
 `shorebird generate` will generate the necessary server and client code
 to connect to the function.
@@ -110,6 +110,8 @@ void main() {
   currently Client.post will throw an exception if the server returns
   a non-200 response.  Instead we should have structured error reporting between
   client and server (including possibly stack traces in dev mode?).
+- There is no way to specify assets to include alongside your server code.
+- There is no way to see logs from a deployed server (local logs work fine).
 
 ## Missing support in Endpoint / Transportable / Storable generation
 - Endpoints can't take Nullable parameters yet.

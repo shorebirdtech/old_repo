@@ -32,6 +32,7 @@ class Session {
 
   void save() {
     var authFile = File(authFilePath);
+    authFile.createSync(recursive: true);
     authFile.writeAsStringSync(jsonEncode(toJson()));
   }
 }
