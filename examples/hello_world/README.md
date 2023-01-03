@@ -1,0 +1,1 @@
+Showcasing what the most simple, single-file Shorebird app looks like.
