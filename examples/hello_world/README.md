@@ -1,1 +1,1 @@
-Showcasing what the most simple, single-file Shorebird app looks like.
+Showcasing what the most simple, single-file Shorebird serverless app looks like.

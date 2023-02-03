@@ -1,4 +1,4 @@
-Pure-dart example of using Shorebird to create a simple post and watch RPC
+Pure-dart example of using Shorebird serverless to create a simple post and watch RPC
 with a custom type.
 
 # Usage
