@@ -13,4 +13,5 @@ shorebird run
   I think this is due to one of the Streams not forwarding a close message.
 - Client never gets an echo for the 5th message.
 - Client does not know how to disconnect on idle or reconnect with backoff.
-- Need to test nullable argument types (not yet supported).
+- Need to test nullable argument types (not yet supported due to ignoring
+  nullable types in the generator).
