@@ -1,6 +1,21 @@
+# Updater library
+
 Sketching out what the update library could look like.
 
 It's build to be a .so with a C api, loadable by other languages.
+
+Split into two pieces "library" and "cli", but share a cargo workspace.
+
+Cli is just a test tool to exercise the library.  Currently it uses a
+Rust ABI to access the library, eventually that will be a C API/ABI.
+
+
+# Usage
+
+`cargo run` will automatically build the library and cli, and run the cli.
+`cargo run check` will check for an version update.
+`cargo run current` will print the current version info.
+
 
 ## MVP
 

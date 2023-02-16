@@ -135,7 +135,10 @@ pub fn current_info() -> Option<VersionInfo> {
     return current_version(state.unwrap());
 }
 
-// pub fn update( config: AppConfig) -> () {
+// pub fn update(config: AppConfig) -> () {
+//     // Check for update.
+//     // If needed, download the new version.
+//     // Install the new version.
 //     // Download the new version
 //     // Install the new version
 //     // Restart the application

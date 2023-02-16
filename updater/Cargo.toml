@@ -1,14 +1,2 @@
-[package]
-name = "updater"
-version = "0.1.0"
-edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-
-# Clap dependency belongs in a separate demo app rather
-# than the main library.
-[dependencies]
-clap = { version = "4.1.6", features = ["derive"] }
-reqwest = { version = "0.11", features = ["blocking", "json"] }
-serde = { version = "1.0", features = ["derive"] }
+[workspace]
+members = ["cli", "library"]
