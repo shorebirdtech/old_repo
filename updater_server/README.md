@@ -1,0 +1,1 @@
+This is a mock updater server for testing the update client.
