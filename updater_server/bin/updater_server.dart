@@ -10,7 +10,7 @@ void main() async {
 // response: {"needs_update": true, "version": "1.0.1", "hash": "xyz", "url": "http://localhost:8080/releases/1.0.0.txt"}
 
   var router = Router();
-  router.get('/updater', (Request request) {
+  router.post('/updater', (Request request) {
     if (request.url.queryParameters['version'] != '1.0.1') {
       return Response.ok(jsonEncode(<String, dynamic>{
         "needs_update": true,

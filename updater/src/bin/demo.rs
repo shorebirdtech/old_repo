@@ -18,15 +18,16 @@ enum Commands {
 fn main() {
     let cli = Cli::parse();
 
+    let config = updater::AppConfig {
+        client_id: "demo",
+        // base_url: "http://localhost:8080",
+        // channel: "stable",
+    };
+
     // You can check for the existence of subcommands, and if found use their
     // matches just as you would the top level cmd
     match &cli.command {
         Some(Commands::Check {}) => {
-            let config = updater::AppConfig {
-                client_id: "demo",
-                url: "https://update-server.example.com",
-                channel: "stable",
-            };
             let needs_update = updater::check_for_update(config);
             println!("Checking for update...");
             if needs_update {

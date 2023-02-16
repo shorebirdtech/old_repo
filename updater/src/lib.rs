@@ -1,11 +1,14 @@
-#[allow(dead_code)]
+use std::collections::HashMap;
+
+use serde::Deserialize;
+
 pub struct AppConfig<'a> {
     // provided from the application
     pub client_id: &'a str,
     // typically default=shorebird, but provided by the app as override?
-    pub url: &'a str,
+    // pub base_url: Option<&'a str>,
     // typically default=stable, but provided by the app as override.
-    pub channel: &'a str,
+    // pub channel: Option<&'a str>,
     // Other needs:
     // Architecture? Or engine can get that itself?
     // fallback path?  Or engine just returns null and caller figures that out?
@@ -28,6 +31,12 @@ struct UpdaterState {
     slots: Vec<Slot>,
 }
 
+struct ResolvedConfig {
+    client_id: String,
+    base_url: String,
+    channel: String,
+}
+
 fn load_state() -> Option<UpdaterState> {
     // Load UpdaterState from disk
     // If there is no state, make an empty state.
@@ -37,14 +46,68 @@ fn load_state() -> Option<UpdaterState> {
     });
 }
 
-pub fn check_for_update(_config: AppConfig) -> bool {
+fn resolve_config(config: AppConfig) -> ResolvedConfig {
+    // Resolve the config
+    // If there is no base_url, use the default.
+    // If there is no channel, use the default.
+    return ResolvedConfig {
+        client_id: config.client_id.to_string(),
+        base_url: "http://localhost:8080".to_string(),
+        channel: "stable".to_string(),
+    };
+}
+
+fn updates_url(config: ResolvedConfig) -> String {
+    return format!("{}/updater", config.base_url);
+}
+
+#[derive(Deserialize)]
+struct UpdateResponse {
+    needs_update: bool,
+}
+
+pub fn check_for_update(app_config: AppConfig) -> bool {
+    let config = resolve_config(app_config);
     // Load UpdaterState from disk
     // If there is no state, make an empty state.
-    // let version = current_info();
+    let version = current_info();
     // Check the current slot.
     // Send info from app + current slot to server.
-    // Server returns if there is a new version available.
-    return false;
+    let mut map = HashMap::new();
+    map.insert("client_id", config.client_id.to_owned());
+    map.insert("channel", config.channel.to_owned());
+    map.insert("arch", "x86_64".to_string());
+    map.insert("platform", "windows".to_string());
+    match version {
+        Some(v) => {
+            map.insert("hash", v.hash);
+            map.insert("version", v.version);
+        }
+        None => {}
+    }
+
+    let url = updates_url(config);
+    let client = reqwest::blocking::Client::new();
+    let response = client.post(url).json(&map).send();
+    match response {
+        Err(err) => {
+            eprintln!("Problem fetching: {err}");
+            return false;
+        }
+        Ok(response) => {
+            let result = response.json::<UpdateResponse>();
+            match result {
+                Err(err) => {
+                    eprintln!("Problem parsing: {err}");
+                    return false;
+                }
+                Ok(r) => {
+                    // Server returns if there is a new version available.
+                    return r.needs_update;
+                }
+            }
+        }
+    }
 }
 
 fn current_version(state: UpdaterState) -> Option<VersionInfo> {
