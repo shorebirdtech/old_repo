@@ -16,7 +16,7 @@ void main() async {
         "needs_update": true,
         "version": "1.0.1",
         "hash": "xyz",
-        "url": "http://localhost:8080/releases/1.0.1.txt"
+        "download_url": "http://localhost:8080/releases/1.0.1.txt"
       }));
     }
     return Response.ok(jsonEncode(<String, dynamic>{

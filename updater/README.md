@@ -16,6 +16,15 @@ Rust ABI to access the library, eventually that will be a C API/ABI.
 `cargo run check` will check for an version update.
 `cargo run current` will print the current version info.
 
+Version checks require the update_server also to be running:
+```
+cd ../update_server
+dart run bin/updater_server.dart
+```
+
+# TODO:
+* Move to 'anyhow' for error management.
+
 
 ## MVP
 

@@ -13,6 +13,7 @@ struct Cli {
 enum Commands {
     Check {},
     Current {},
+    Update {},
 }
 
 fn main() {
@@ -20,6 +21,7 @@ fn main() {
 
     let config = updater::AppConfig {
         client_id: "demo",
+        cache_dir: None,
         // base_url: "http://localhost:8080",
         // channel: "stable",
     };
@@ -37,7 +39,7 @@ fn main() {
             }
         }
         Some(Commands::Current {}) => {
-            let version = updater::current_info();
+            let version = updater::current_info(config);
             println!("Current info:");
             match version {
                 Some(v) => {
@@ -49,6 +51,10 @@ fn main() {
                     println!("None");
                 }
             }
+        }
+        Some(Commands::Update {}) => {
+            let status = updater::update(config);
+            println!("Update: {}", status);
         }
         None => {}
     }
