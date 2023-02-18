@@ -1,10 +1,13 @@
 [![Pub package](https://img.shields.io/pub/v/shorebird.svg)](https://pub.dev/packages/shorebird)
 [![Discord](https://dcbadge.vercel.app/api/server/9hKJcWGcaB)](https://discord.gg/9hKJcWGcaB)
 
-# Shorebird
+NOTE: This package is not being actively developed.  It was a fun experiment
+and we will likely come back to it, but for now we're working on code push.
 
-This package is a work in progress.  If you're interested in using Shorebird,
-please join us on Discord: https://discord.gg/9hKJcWGcaB
+If you're excited about this Dart-serverless exploration, hop on Discord and
+tell us!  We're here to build things people want to use, so let us know.
+
+# Shorebird
 
 # Installation
 
