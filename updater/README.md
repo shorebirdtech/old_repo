@@ -13,18 +13,33 @@ Rust ABI to access the library, eventually that will be a C API/ABI.
 # Usage
 
 `cargo run` will automatically build the library and cli, and run the cli.
-`cargo run check` will check for an version update.
 `cargo run current` will print the current version info.
+`cargo run check` will check for an version update.
+`cargo run update` will pull the latest version if told to by the server.
 
-Version checks require the update_server also to be running:
+`check` and `update` require the update_server also to be running:
 ```
 cd ../update_server
 dart run bin/updater_server.dart
 ```
 
 # TODO:
-* Move to 'anyhow' for error management.
+* Remove all non-MVP code.
+* Add a C api.
+* Wire up dart:ffi package with the C api and build a demo flutter app.
+* Write tests for state management.
+* Make state management/filesystem management atomic (and tested).
+* Move updater values out of the params into post body?
+* Support hashing values and check them?
+* Add "validate" command to validate state.
+* Write a mode that runs the updater first and then launches whatever is downloaded?
 
+# Rust
+We use normal rust idioms (e.g. Result) inside the library and then bridge those
+to C via an explicit stable C API (explicit enums, null pointers for optional
+arguments, etc).  The reason for this is that it lets the Rust code feel natural
+and also gives us maximum flexibility in the future for exposing more in the C
+API without having to refactor the internals of the library.
 
 ## MVP
 

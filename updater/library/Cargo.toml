@@ -5,9 +5,19 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[lib]
+# Build a rust library (for testing with rust "cli" project) and a c library
+crate-type = ["lib", "cdylib"]
+
 [dependencies]
+# Used for exposing C API
+libc = "0.2.98"
+# Used for networking.
 reqwest = { version = "0.11", features = ["blocking", "json"] }
+# Json serialization/de-serialization.
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0.93"
+# Used for creating custom errors.
 thiserror = "1.0"
+# Used for error handling.
 anyhow = {version = "1.0.69", features = ["backtrace"]}
