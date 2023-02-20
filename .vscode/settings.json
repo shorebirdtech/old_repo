@@ -6,6 +6,7 @@
         "calloc",
         "dylib",
         "libapp",
+        "struct",
         "thiserror"
     ]
 }

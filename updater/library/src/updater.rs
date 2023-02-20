@@ -36,10 +36,10 @@ impl Display for UpdateStatus {
     }
 }
 
-pub struct AppConfig<'a> {
+pub struct AppConfig {
     // provided from the application
-    pub client_id: &'a str,
-    pub cache_dir: Option<&'a str>,
+    pub client_id: String,
+    pub cache_dir: Option<String>,
     // typically default=shorebird, but provided by the app as override?
     // pub base_url: Option<&'a str>,
     // typically default=stable, but provided by the app as override.
@@ -110,7 +110,11 @@ fn resolve_config(config: &AppConfig) -> ResolvedConfig {
     return ResolvedConfig {
         client_id: config.client_id.to_string(),
         base_url: "http://localhost:8080".to_string(),
-        cache_dir: config.cache_dir.unwrap_or("updater_cache").to_string(),
+        cache_dir: config
+            .cache_dir
+            .as_deref()
+            .unwrap_or("updater_cache")
+            .to_owned(),
         channel: "stable".to_string(),
     };
 }
@@ -191,7 +195,7 @@ fn current_version_internal(state: &UpdaterState) -> Option<VersionInfo> {
     });
 }
 
-pub fn current_version(config: &AppConfig) -> Option<VersionInfo> {
+pub fn active_version(config: &AppConfig) -> Option<VersionInfo> {
     let config = resolve_config(config);
     let state = load_state(&config.cache_dir).unwrap_or_default();
     return current_version_internal(&state);

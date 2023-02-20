@@ -20,7 +20,7 @@ fn main() {
     let cli = Cli::parse();
 
     let config = updater::AppConfig {
-        client_id: "demo",
+        client_id: "demo".to_string(),
         cache_dir: None,
         // base_url: "http://localhost:8080",
         // channel: "stable",
@@ -39,7 +39,7 @@ fn main() {
             }
         }
         Some(Commands::Current {}) => {
-            let version = updater::current_version(&config);
+            let version = updater::active_version(&config);
             println!("Current version info:");
             match version {
                 Some(v) => {

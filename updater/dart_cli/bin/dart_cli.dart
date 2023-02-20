@@ -11,7 +11,8 @@ void main(List<String> args) async {
 
   final runner = CommandRunner<void>('updater', 'Updater CLI')
     ..addCommand(CheckForUpdate(updater))
-    ..addCommand(PrintVersion(updater));
+    ..addCommand(PrintVersion(updater))
+    ..addCommand(PrintPath(updater));
   await runner.run(args);
 }
 
@@ -51,6 +52,22 @@ class PrintVersion extends Command<void> {
 
   @override
   void run() {
-    print("Current version: ${updater.version()}");
+    print(updater.activeVersion());
+  }
+}
+
+class PrintPath extends Command<void> {
+  final Updater updater;
+  PrintPath(this.updater);
+
+  @override
+  final name = 'path';
+
+  @override
+  final description = 'Print current installed path.';
+
+  @override
+  void run() {
+    print(updater.activePath());
   }
 }
