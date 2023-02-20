@@ -106,3 +106,8 @@ Want to roll-out to x population.
 
 Another use of clientId is giving them to mixpanel, etc.
 What data does the update engine expose that feeds into people’s metrics.
+
+
+References
+* https://theupdateframework.io/
+* https://fuchsia.dev/fuchsia-src/concepts/packages/software_update_system
