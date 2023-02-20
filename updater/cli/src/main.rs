@@ -30,7 +30,7 @@ fn main() {
     // matches just as you would the top level cmd
     match &cli.command {
         Some(Commands::Check {}) => {
-            let needs_update = updater::check_for_update(config);
+            let needs_update = updater::check_for_update(&config);
             println!("Checking for update...");
             if needs_update {
                 println!("Update needed.");
@@ -39,8 +39,8 @@ fn main() {
             }
         }
         Some(Commands::Current {}) => {
-            let version = updater::current_info(config);
-            println!("Current info:");
+            let version = updater::current_version(&config);
+            println!("Current version info:");
             match version {
                 Some(v) => {
                     println!("path: {:?}", v.path);
@@ -53,7 +53,7 @@ fn main() {
             }
         }
         Some(Commands::Update {}) => {
-            let status = updater::update(config);
+            let status = updater::update(&config);
             println!("Update: {}", status);
         }
         None => {}

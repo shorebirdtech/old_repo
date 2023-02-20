@@ -103,7 +103,7 @@ fn save_state(state: &UpdaterState, cache_dir: &str) -> anyhow::Result<()> {
     Ok(())
 }
 
-fn resolve_config(config: AppConfig) -> ResolvedConfig {
+fn resolve_config(config: &AppConfig) -> ResolvedConfig {
     // Resolve the config
     // If there is no base_url, use the default.
     // If there is no channel, use the default.
@@ -130,13 +130,13 @@ struct UpdateResponse {
     download_url: String,
 }
 
-pub fn check_for_update(app_config: AppConfig) -> bool {
+pub fn check_for_update(app_config: &AppConfig) -> bool {
     let config = resolve_config(app_config);
     // Load UpdaterState from disk
     // If there is no state, make an empty state.
     let state = load_state(&config.cache_dir).unwrap_or_default();
     // Check the current slot.
-    let version = current_version(&state);
+    let version = current_version_internal(&state);
     // Send info from app + current slot to server.
     let response_result = send_update_request(&config, version);
     match response_result {
@@ -177,7 +177,7 @@ fn send_update_request(
     }
 }
 
-fn current_version(state: &UpdaterState) -> Option<VersionInfo> {
+fn current_version_internal(state: &UpdaterState) -> Option<VersionInfo> {
     // If there is no state, return None.
     if state.slots.is_empty() {
         return None;
@@ -191,10 +191,10 @@ fn current_version(state: &UpdaterState) -> Option<VersionInfo> {
     });
 }
 
-pub fn current_info(config: AppConfig) -> Option<VersionInfo> {
+pub fn current_version(config: &AppConfig) -> Option<VersionInfo> {
     let config = resolve_config(config);
     let state = load_state(&config.cache_dir).unwrap_or_default();
-    return current_version(&state);
+    return current_version_internal(&state);
 }
 
 fn unused_slot(state: &UpdaterState) -> usize {
@@ -269,7 +269,7 @@ fn download_into_slot(
 fn update_internal(config: &ResolvedConfig) -> anyhow::Result<UpdateStatus> {
     // Load the state from disk.
     let mut state = load_state(&config.cache_dir).unwrap_or_default();
-    let version = current_version(&state);
+    let version = current_version_internal(&state);
     // Check for update.
     let response = send_update_request(&config, version)?;
     if !response.needs_update {
@@ -285,8 +285,8 @@ fn update_internal(config: &ResolvedConfig) -> anyhow::Result<UpdateStatus> {
     return Ok(UpdateStatus::UpdateInstalled);
 }
 
-pub fn update(app_config: AppConfig) -> UpdateStatus {
-    let config = resolve_config(app_config);
+pub fn update(app_config: &AppConfig) -> UpdateStatus {
+    let config = resolve_config(&app_config);
     let result = update_internal(&config);
     match result {
         Err(err) => {

@@ -5,12 +5,20 @@ void main(List<String> args) async {
   // This might pass a path or flavor (debug/release) later.
   Updater.loadLibrary();
 
+  var clientId = 'my-client-id';
+  var cacheDir = 'updater_cache';
+  var updater = Updater(clientId, cacheDir);
+
   final runner = CommandRunner<void>('updater', 'Updater CLI')
-    ..addCommand(CheckForUpdate());
+    ..addCommand(CheckForUpdate(updater))
+    ..addCommand(PrintVersion(updater));
   await runner.run(args);
 }
 
 class CheckForUpdate extends Command<void> {
+  final Updater updater;
+  CheckForUpdate(this.updater);
+
   @override
   final name = 'check';
 
@@ -28,5 +36,21 @@ class CheckForUpdate extends Command<void> {
     } else {
       print('No update available');
     }
+  }
+}
+
+class PrintVersion extends Command<void> {
+  final Updater updater;
+  PrintVersion(this.updater);
+
+  @override
+  final name = 'version';
+
+  @override
+  final description = 'Print current installed version.';
+
+  @override
+  void run() {
+    print("Current version: ${updater.version()}");
   }
 }
