@@ -131,13 +131,12 @@ struct UpdateResponse {
 }
 
 pub fn check_for_update(app_config: AppConfig) -> bool {
+    let config = resolve_config(app_config);
     // Load UpdaterState from disk
     // If there is no state, make an empty state.
-    let config = resolve_config(app_config);
     let state = load_state(&config.cache_dir).unwrap_or_default();
-    let version = current_version(&state);
-
     // Check the current slot.
+    let version = current_version(&state);
     // Send info from app + current slot to server.
     let response_result = send_update_request(&config, version);
     match response_result {
@@ -191,20 +190,6 @@ fn current_version(state: &UpdaterState) -> Option<VersionInfo> {
         hash: slot.hash.clone(),
     });
 }
-
-// fn current_info_internal(config: &ResolvedConfig) -> Option<VersionInfo> {
-//     // Load the state from disk.
-//     let state = load_state(&config.cache_dir);
-//     match state {
-//         Err(err) => {
-//             eprintln!("Problem loading state: {err}");
-//             return None;
-//         }
-//         Ok(state) => {
-//             return current_version(state);
-//         }
-//     }
-// }
 
 pub fn current_info(config: AppConfig) -> Option<VersionInfo> {
     let config = resolve_config(config);

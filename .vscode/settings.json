@@ -3,6 +3,7 @@
         "reqwest"
     ],
     "cSpell.words": [
+        "calloc",
         "dylib",
         "libapp",
         "thiserror"
