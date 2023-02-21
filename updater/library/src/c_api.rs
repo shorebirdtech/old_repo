@@ -3,11 +3,6 @@ use std::os::raw::c_char;
 
 use crate::updater;
 
-#[no_mangle]
-pub extern "C" fn hello_world() {
-    println!("Hello, world!");
-}
-
 fn app_config_from_c(c_client_id: *const c_char, c_cache_dir: *const c_char) -> updater::AppConfig {
     let client_id = unsafe { CStr::from_ptr(c_client_id) }.to_str().unwrap();
     let cache_dir = if c_cache_dir == std::ptr::null() {
@@ -68,4 +63,10 @@ pub extern "C" fn free_string(c_string: *mut c_char) {
 pub extern "C" fn check_for_update(c_client_id: *const c_char, c_cache_dir: *const c_char) -> bool {
     let config = app_config_from_c(c_client_id, c_cache_dir);
     return updater::check_for_update(&config);
+}
+
+#[no_mangle]
+pub extern "C" fn update(c_client_id: *const c_char, c_cache_dir: *const c_char) {
+    let config = app_config_from_c(c_client_id, c_cache_dir);
+    updater::update(&config);
 }

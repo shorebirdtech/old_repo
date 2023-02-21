@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:args/command_runner.dart';
 import 'package:dart_cli/updater.dart';
 
@@ -12,7 +15,9 @@ void main(List<String> args) async {
   final runner = CommandRunner<void>('updater', 'Updater CLI')
     ..addCommand(CheckForUpdate(updater))
     ..addCommand(PrintVersion(updater))
-    ..addCommand(PrintPath(updater));
+    ..addCommand(PrintPath(updater))
+    ..addCommand(Update(updater))
+    ..addCommand(Run(updater));
   await runner.run(args);
 }
 
@@ -28,9 +33,6 @@ class CheckForUpdate extends Command<void> {
 
   @override
   void run() {
-    var clientId = 'my-client-id';
-    var cacheDir = 'updater_cache';
-    var updater = Updater(clientId, cacheDir);
     var result = updater.checkForUpdate();
     if (result) {
       print('Update available');
@@ -69,5 +71,52 @@ class PrintPath extends Command<void> {
   @override
   void run() {
     print(updater.activePath());
+  }
+}
+
+class Update extends Command<void> {
+  final Updater updater;
+  Update(this.updater);
+
+  @override
+  final name = 'update';
+
+  @override
+  final description = 'Update to the latest version.';
+
+  @override
+  void run() {
+    updater.update();
+  }
+}
+
+class Run extends Command<void> {
+  final Updater updater;
+  Run(this.updater);
+
+  @override
+  final name = 'run';
+
+  @override
+  final description = 'Run the active version.';
+
+  @override
+  void run() async {
+    // This is a basic demo of what this might look like.
+    // Real callers wouldn't likely do this from Dart as there is no need
+    // to have two copies of the Dart VM running.
+    var path = updater.activePath();
+    if (path == null) {
+      print('No active version (should run the bundled version)');
+      return;
+    }
+    // Should this run update first?
+    print('Running $path');
+    // Is there a portable way to just "exec" and replace the current process?
+    var process = await Process.start(Platform.executable, ['run', path]);
+    process.stdout.transform(utf8.decoder).forEach(stdout.write);
+    process.stderr.transform(utf8.decoder).forEach(stderr.write);
+    // TODO: Handle stdin.
+    exit(await process.exitCode);
   }
 }

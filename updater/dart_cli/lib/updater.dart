@@ -46,6 +46,10 @@ class Updater {
     return _callWithContext(bindings.checkForUpdate);
   }
 
+  void update() {
+    return _callWithContext(bindings.update);
+  }
+
   String? activeVersion() {
     return _callWithContext((clientId, cacheDir) {
       ffi.Pointer<Utf8> cVersion = ffi.Pointer<Utf8>.fromAddress(0);

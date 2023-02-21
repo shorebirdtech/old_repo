@@ -11,12 +11,12 @@ void main() async {
 
   var router = Router();
   router.post('/updater', (Request request) {
-    if (request.url.queryParameters['version'] != '1.0.1') {
+    if (request.url.queryParameters['version'] != '1.0.2') {
       return Response.ok(jsonEncode(<String, dynamic>{
         "needs_update": true,
-        "version": "1.0.1",
+        "version": "1.0.2",
         "hash": "xyz",
-        "download_url": "http://localhost:8080/releases/1.0.1.txt"
+        "download_url": "http://localhost:8080/releases/1.0.2.txt"
       }));
     }
     return Response.ok(jsonEncode(<String, dynamic>{
@@ -24,7 +24,11 @@ void main() async {
     }));
   });
   router.get('/releases/<version>', (Request request, String version) {
-    return Response.ok(version, headers: {'Content-Type': 'text/plain'});
+    return Response.ok('''
+void main() {
+  print('Hello, $version!');
+}
+''', headers: {'Content-Type': 'text/plain'});
   });
 
   var handler =
