@@ -1,0 +1,13 @@
+solutions = [
+  {
+    "managed": False,
+    "name": "src/flutter",
+    "url": "git@github.com:<your_name_here>/engine.git",
+    "custom_deps": {},
+    "deps_file": "DEPS",
+    "safesync_url": "",
+    "custom_vars": {
+      "download_emsdk": True,
+    },
+  },
+]
