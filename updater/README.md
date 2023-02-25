@@ -4,15 +4,15 @@ Sketching out what the update library could look like.
 
 It's build to be a .so with a C api, loadable by other languages.
 
-Split into two pieces "library" and "cli", but share a cargo workspace.
-
-Cli is just a test tool to exercise the library.  Currently it uses a
-Rust ABI to access the library, eventually that will be a C API/ABI.
-
+# Parts
+* cli: A command line application to test ffi wrapping of updater library.
+* library: The rust library that does the actual update work.
+* update_server: A simple server that provides update information.
+* dart_cli: A command line application to test ffi wrapping of updater library.
 
 # Usage
 
-`cargo run` will automatically build the library and cli, and run the cli.
+`cargo run` will automatically build the library and cli, and run the rust cli.
 `cargo run current` will print the current version info.
 `cargo run check` will check for an version update.
 `cargo run update` will pull the latest version if told to by the server.
@@ -25,7 +25,6 @@ dart run bin/updater_server.dart
 
 # TODO:
 * Remove all non-MVP code.
-* Add a C api.
 * Wire up dart:ffi package with the C api and build a demo flutter app.
 * Write tests for state management.
 * Make state management/filesystem management atomic (and tested).
@@ -33,6 +32,9 @@ dart run bin/updater_server.dart
 * Support hashing values and check them?
 * Add "validate" command to validate state.
 * Write a mode that runs the updater first and then launches whatever is downloaded?
+* Use cbindgen to generate the C api header file.
+  https://github.com/eqrion/cbindgen/blob/master/docs.md
+
 
 # Rust
 We use normal rust idioms (e.g. Result) inside the library and then bridge those
@@ -111,3 +113,9 @@ What data does the update engine expose that feeds into people’s metrics.
 References
 * https://theupdateframework.io/
 * https://fuchsia.dev/fuchsia-src/concepts/packages/software_update_system
+
+
+
+# Notes
+* Shorebird use web-created accounts for easy set-up of the SDK.
+* When you download the SDK it should include your API Key in it (save you a setup step).
