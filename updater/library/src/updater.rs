@@ -124,14 +124,17 @@ fn updates_url(config: &ResolvedConfig) -> String {
 }
 
 #[derive(Deserialize)]
+struct VersionResponse {
+    version: String,
+    hash: String,
+    download_url: String,
+}
+
+#[derive(Deserialize)]
 struct UpdateResponse {
     needs_update: bool,
     #[serde(default)]
-    version: String,
-    #[serde(default)]
-    hash: String,
-    #[serde(default)]
-    download_url: String,
+    version: Option<VersionResponse>,
 }
 
 pub fn check_for_update(app_config: &AppConfig) -> bool {
@@ -158,27 +161,37 @@ fn send_update_request(
     config: &ResolvedConfig,
     version: Option<VersionInfo>,
 ) -> anyhow::Result<UpdateResponse> {
+    #[cfg(target_os = "macos")]
+    static PLATFORM: &str = "macos";
+    #[cfg(target_os = "linux")]
+    static PLATFORM: &str = "linux";
+    #[cfg(target_os = "windows")]
+    static PLATFORM: &str = "windows";
+
+    #[cfg(target_arch = "x86")]
+    static ARCH: &str = "x86";
+    #[cfg(target_arch = "x86_64")]
+    static ARCH: &str = "x86_64";
+    #[cfg(target_arch = "aarch64")]
+    static ARCH: &str = "aarch64";
+
     // Send the request to the server.
     let client = reqwest::blocking::Client::new();
-    let mut params = HashMap::new();
-    params.insert("client_id", config.client_id.clone());
-    params.insert("channel", config.channel.clone());
+    let mut body = HashMap::new();
+    body.insert("client_id", config.client_id.clone());
+    body.insert("channel", config.channel.clone());
     if let Some(version) = version {
-        params.insert("version", version.version);
-        params.insert("hash", version.hash);
+        body.insert("version", version.version);
+        body.insert("hash", version.hash);
     }
-    let url = updates_url(config);
-    let response = client.post(&url).query(&params).send()?;
-    let result = response.json();
-    match result {
-        Err(err) => {
-            eprintln!("Failed to parse response: {err}");
-            return Err(err.into());
-        }
-        Ok(response) => {
-            return Ok(response);
-        }
-    }
+    body.insert("platform", PLATFORM.to_string());
+    body.insert("arch", ARCH.to_string());
+    let response = client
+        .post(&updates_url(config))
+        .json(&body)
+        .send()?
+        .json()?;
+    return Ok(response);
 }
 
 fn current_version_internal(state: &UpdaterState) -> Option<VersionInfo> {
@@ -247,12 +260,15 @@ fn download_into_slot(
         .join(format!("slot_{}", slot_index))
         .join("libapp.txt");
 
+    // TODO: Shouldn't crash on malformed response.
+    let version = update_response.version.as_ref().unwrap();
+
     // We should download into a separate place and move into place.
     // That would allow us to check the hash before moving into place.
     // Would also allow the move/state update to be "atomic" or at least allow
     // us to carefully guard against state corruption.
     // Would also let us support when we need to allow the system to download for us (e.g. iOS).
-    download_file_to_path(&update_response.download_url, &path)?;
+    download_file_to_path(&version.download_url, &path)?;
     // Check the hash against the download?
 
     // Update the state to include the new version.
@@ -261,8 +277,8 @@ fn download_into_slot(
         slot_index,
         Slot {
             path: path.to_str().unwrap().to_string(),
-            version: update_response.version.clone(),
-            hash: update_response.hash.clone(),
+            version: version.version.clone(),
+            hash: version.hash.clone(),
         },
     );
     save_state(&state, &config.cache_dir)?;
