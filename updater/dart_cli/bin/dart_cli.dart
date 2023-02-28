@@ -92,7 +92,9 @@ class Update extends Command<void> {
 
 class Run extends Command<void> {
   final Updater updater;
-  Run(this.updater);
+  Run(this.updater) {
+    argParser.addFlag('update', abbr: 'u', help: 'Update before running.');
+  }
 
   @override
   final name = 'run';
@@ -105,6 +107,11 @@ class Run extends Command<void> {
     // This is a basic demo of what this might look like.
     // Real callers wouldn't likely do this from Dart as there is no need
     // to have two copies of the Dart VM running.
+
+    if (argResults!['update']) {
+      updater.update();
+    }
+
     var path = updater.activePath();
     if (path == null) {
       print('No active version (should run the bundled version)');
