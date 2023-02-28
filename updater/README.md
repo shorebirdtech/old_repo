@@ -5,26 +5,64 @@ Sketching out what the update library could look like.
 It's build to be a .so with a C api, loadable by other languages.
 
 # Parts
-* cli: A command line application to test ffi wrapping of updater library.
+* cli: Test the updater library via the Rust API (for development).
+* dart_cli: Test ffi wrapping of updater library.
 * library: The rust library that does the actual update work.
-* update_server: A simple server that provides update information.
-* dart_cli: A command line application to test ffi wrapping of updater library.
+* publisher: A CLI to publish new versions.
+* ../update_server: A simple server that provides update information.
 
-# Usage
+# Development
 
-`cargo run` will automatically build the library and cli, and run the rust cli.
-`cargo run current` will print the current version info.
-`cargo run check` will check for an version update.
-`cargo run update` will pull the latest version if told to by the server.
+There are two CLIs for easy testing of the library and the C api.
 
-`check` and `update` require the update_server also to be running:
+Both require the library to be built first:
+`cargo build` will build the debug version of the library.
+
+Both require a running update_server.  In a separate terminal:
 ```
 cd ../update_server
 dart run bin/updater_server.dart
 ```
 
+# Dart CLI
+
+The Dart CLI uses the C api to load the library and call into it.
+It also has a "run" command which assumes the published versions are just
+dart scripts.
+
+Example usage:
+```
+% dart run publisher/bin/publisher.dart publish a.dart
+Deployed successful.
+% dart run dart_cli/bin/dart_cli.dart run --update    
+Running updater_cache/slot_0/libapp.txt
+Version A
+% dart run publisher/bin/publisher.dart publish b.dart
+Deployed successful.
+% dart run dart_cli/bin/dart_cli.dart run --update    
+Running updater_cache/slot_1/libapp.txt
+Version B
+```
+
+# Rust CLI
+
+The Rust CLI uses the (internal) Rust API instead of the C API which can
+be nice during development of the library itself.
+
+`cargo run` will build the library and rust cli, and run the rust cli.
+`cargo run current` will print the current version info.
+`cargo run check` will check for an version update.
+`cargo run update` will pull the latest version if told to by the server.
+
+`check` and `update` require the update_server also to be running:
+
+
 # TODO:
 * Remove all non-MVP code.
+* Clean up `shorebird` command and merge `publisher` into that.
+* Add an async API.
+* Add support for "channels" (e.g. beta, stable, etc).
+* Actually respect "client id" and "platform" and "arch" in the server.
 * Wire up dart:ffi package with the C api and build a demo flutter app.
 * Write tests for state management.
 * Make state management/filesystem management atomic (and tested).
@@ -42,24 +80,6 @@ to C via an explicit stable C API (explicit enums, null pointers for optional
 arguments, etc).  The reason for this is that it lets the Rust code feel natural
 and also gives us maximum flexibility in the future for exposing more in the C
 API without having to refactor the internals of the library.
-
-## MVP
-
-updater check
--- says yes / no for update
-updater path
--- tells which the current path to use it.
-updater update
--- does synchronous update, polling for status regularly?
-
-API
-- check if there is an update
-- tell us which .so to load
-- start an update
-- give status on the update in progress
-- cancel an update
-- 
-
 
 ## Notes
 * https://github.com/RubberDuckEng/safe_wren has an example of building a rust library and exposing it with a C api.
