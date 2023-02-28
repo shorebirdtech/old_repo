@@ -8,8 +8,7 @@ Note: None of these are yet ready for production use.
 ## Getting Started
 
 For our experiments with:
-* codepush for Flutter / Dart, see:
-    `package:codepush` [README.md](packages/codepush/README.md)
+* codepush for Flutter / Dart, see [updater/README.md](updater/README.md)
 * serverless Dart, see: `package:shorebird` [README.md](packages/shorebird/README.md)
 
 If you're interested in any of the above, please join us on
