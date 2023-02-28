@@ -5,6 +5,11 @@ use std::io::{BufReader, BufWriter, Write};
 use std::path::{Path, PathBuf};
 use std::string::ToString;
 
+extern crate android_logger;
+
+use android_logger::Config;
+use log::LevelFilter;
+
 use serde::{Deserialize, Serialize};
 // use thiserror::Error;
 
@@ -148,7 +153,7 @@ pub fn check_for_update(app_config: &AppConfig) -> bool {
     let response_result = send_update_request(&config, version);
     match response_result {
         Err(err) => {
-            eprintln!("Failed update check: {err}");
+            error!("Failed update check: {err}");
             return false;
         }
         Ok(response) => {
@@ -167,6 +172,8 @@ fn send_update_request(
     static PLATFORM: &str = "linux";
     #[cfg(target_os = "windows")]
     static PLATFORM: &str = "windows";
+    #[cfg(target_os = "android")]
+    static PLATFORM: &str = "android";
 
     #[cfg(target_arch = "x86")]
     static ARCH: &str = "x86";
@@ -305,13 +312,25 @@ fn update_internal(config: &ResolvedConfig) -> anyhow::Result<UpdateStatus> {
     return Ok(UpdateStatus::UpdateInstalled);
 }
 
+fn init_logging() {
+    android_logger::init_once(
+        Config::default()
+            // `flutter` tool ignores non-flutter tagged logs.
+            .with_tag("flutter")
+            .with_max_level(LevelFilter::Debug),
+    );
+    debug!("Logging initialized");
+}
+
 pub fn update(app_config: &AppConfig) -> UpdateStatus {
+    init_logging();
+
     let config = resolve_config(&app_config);
     let result = update_internal(&config);
     match result {
         Err(err) => {
-            eprintln!("Problem updating: {err}");
-            eprintln!("{}", err.backtrace());
+            error!("Problem updating: {err}");
+            error!("{}", err.backtrace());
             return UpdateStatus::UpdateHadError;
         }
         Ok(status) => status,

@@ -7,3 +7,6 @@ mod updater;
 
 // Take all public items from the updater namespace and make them public.
 pub use self::updater::*;
+
+#[macro_use]
+extern crate log;

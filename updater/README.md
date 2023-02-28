@@ -57,6 +57,13 @@ be nice during development of the library itself.
 `check` and `update` require the update_server also to be running:
 
 
+## Android
+
+Building for android requires:
+https://github.com/bbqsrc/cargo-ndk
+
+As well as the Android NDK installed.
+
 # TODO:
 * Remove all non-MVP code.
 * Clean up `shorebird` command and merge `publisher` into that.
