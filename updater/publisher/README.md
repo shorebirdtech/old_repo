@@ -1,0 +1,1 @@
+This is just a placeholder and should move into the `shorebird` command.
