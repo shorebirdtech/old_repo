@@ -1,1 +1,0 @@
-Flutter-specific bindings for Shorebird.
