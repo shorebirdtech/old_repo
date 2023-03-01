@@ -18,7 +18,7 @@ Future<void> uploadToDeployServer({
   request.files.add(file);
   var response = await request.send();
   if (response.statusCode == 200) {
-    print('Deployed successful.');
+    print('Deploy successful.');
   } else {
     print('Deploy failed: ${response.statusCode} ${response.reasonPhrase}');
   }
