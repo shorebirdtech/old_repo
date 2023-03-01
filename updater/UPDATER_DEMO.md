@@ -25,6 +25,9 @@ https://github.com/flutter/flutter/wiki/Compiling-the-engine
 I would consider building a clean engine first and testing that you have
 that working before trying Shorebird's modified engine.
 
+The hacked up version of the engine used for my demo can be found here:
+https://github.com/shorebirdtech/engine/tree/codepush
+
 # Symlink in the Rust binaries
 
 I symlinked the results of the rust build into the engine/src directory:
@@ -76,6 +79,10 @@ cp build/app/intermediates/stripped_native_libs/release/out/lib/arm64-v8a/libapp
 
 You could dig them out of the apk, but that intermediate directory should be
 the correct file and is much easier.
+
+`flutter build apk -t lib/main_b.dart` should build the app in the way I used
+in my demo (I built it with `flutter run` and modifying main.dart directly, but
+that command should work too).
 
 
 # shorebird command line
